@@ -1,0 +1,141 @@
+﻿<Window x:Class="WTF_DICOM.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WTF_DICOM"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=False}"
+        Style="{StaticResource MaterialDesignWindow}"
+        Title="WTF DICOM" Height="450" Width="800">
+  <Grid>
+    <Grid.RowDefinitions>
+      <!--Menu-->
+      <RowDefinition Height="auto" />
+      <!--Toolbar-->
+      <RowDefinition Height="auto" />
+      <!--Content-->
+      <RowDefinition Height="auto" />
+    </Grid.RowDefinitions>
+
+    <!--Menu-->
+    <Menu Margin="5,5,5,5" MinWidth="200" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" IsMainMenu="True">
+      <MenuItem Header="_File" MinWidth="100">
+        <MenuItem Header="Select Directory" Command="{Binding SelectDirectoryCommand}" />
+        <MenuItem Header="Select File" Command="{Binding SelectFileCommand}" />
+      </MenuItem>
+      <Separator/>
+      <MenuItem Header="E_xit" Command="{x:Static ApplicationCommands.Close}"/>
+    </Menu>
+
+    <!--Toolbar-->
+    <!--TODO-->
+    
+    <!--Content-->
+
+
+    <Grid Grid.Row="2">
+
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="20" />
+        <ColumnDefinition Width="auto" />
+        <ColumnDefinition Width="auto" />
+        <ColumnDefinition Width="auto" />
+        <ColumnDefinition Width="auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="20" />
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="40" />
+        <RowDefinition Height="auto" />
+        <RowDefinition Height="auto" />
+        <RowDefinition Height="auto" />
+        <RowDefinition Height="auto" />
+        <RowDefinition Height="auto" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="20" />
+      </Grid.RowDefinitions>
+
+      <!-- **** Column 1 **** -->
+
+      <!-- Row 0 -->
+      <!-- select all, unselect all Buttons -->
+
+      <!-- Row 1+ -->
+      <!-- Checkbox -->
+      <!-- Added Programmatically-->
+
+
+      <!-- **** Column 1 **** -->
+      <!-- Row 0 -->
+      <!-- display all, display selected Toggle -->
+
+      <!-- Row 1+ -->
+      <!-- File Names and UIDs -->
+      <!-- Added Programmatically-->
+      <DataGrid Grid.Column="1" Grid.Row="1"
+                ItemsSource="{Binding DicomFiles}"
+                x:Name="DicomFileCommonDataGrid"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                CanUserDeleteRows="False"
+                CanUserAddRows="False"
+                CanUserReorderColumns="False"
+                CanUserResizeColumns="False"
+                CanUserSortColumns="False"
+                SelectionMode="Single" SelectionUnit="Cell"
+                AlternationCount="2" AlternatingRowBackground="AliceBlue">
+        <DataGrid.Columns>
+          <DataGridCheckBoxColumn Header="Select" />
+          <DataGridTemplateColumn Header="Filename">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock  MaxWidth="300" Text="{Binding DicomFileName}">
+                  <TextBlock.ToolTip>
+                    <StackPanel Orientation="Vertical">
+                      <TextBlock Text="{Binding DicomFileName}" />
+                      <TextBox Text="Right-Click a cell for more options" />
+                    </StackPanel>
+                  </TextBlock.ToolTip>
+                </TextBlock>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTextColumn Binding="{Binding SOPInstanceUID}" Header="SOPInstanceUID" />
+        </DataGrid.Columns>
+        
+        <DataGrid.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="Copy To Clipboard"
+                      Command="{Binding CopyToClipboardCommand}"
+                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
+            <MenuItem Header="Show all Tags"
+                      Command="{Binding PlaceHolderCommand}"
+                      CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+            <MenuItem Header="Show in Folder"
+                      Command="{Binding PlaceHolderCommand}"
+                      CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+          </ContextMenu>
+        </DataGrid.ContextMenu>
+
+        <DataGrid.CellStyle>
+          <Style TargetType="{x:Type DataGridCell}">
+            <EventSetter Event="GotFocus" Handler="CellClick"/>
+          </Style>
+        </DataGrid.CellStyle>
+
+
+      </DataGrid>
+
+      <!-- **** Column 3 **** -->
+          <!-- Row 0 -->
+          <!-- Display Options Button -->
+
+          <!-- Row 1+ -->
+          <!-- Basic Tags -->
+          <!-- Added Programmatically-->
+
+    </Grid>
+
+  </Grid> <!--end layout Grid-->
+</Window>
