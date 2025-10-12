@@ -73,16 +73,9 @@ namespace WTF_DICOM.Models
                 {
                     // value = tag.ToString();
                     value=ex.Message;
-                }
+                }               
 
-                var valueRepresentations = tag.DictionaryEntry.ValueRepresentations;
-                bool isSequence = false;
-                foreach(var vr in valueRepresentations)
-                {
-                    isSequence = isSequence || (vr == FellowOakDicom.DicomVR.SQ);
-                }
-
-                WTFDicomItem wtfDicomItem =  new WTFDicomItem(tag, value, isSequence);
+                WTFDicomItem wtfDicomItem =  new WTFDicomItem(tag, value);
                 TagsAndValuesList.Add(wtfDicomItem);
             }
         }

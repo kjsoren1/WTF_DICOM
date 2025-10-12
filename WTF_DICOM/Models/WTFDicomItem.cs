@@ -23,19 +23,44 @@ namespace WTF_DICOM.Models
         [ObservableProperty]
         private string? _valueOfTagAsString;
 
-        public WTFDicomItem(DicomTag? dicomTag, string? valueOfTagAsString, bool isSequence)
+        [ObservableProperty]
+        private bool _isSequence = false;
+
+
+        public WTFDicomItem(DicomTag? dicomTag, string? valueOfTagAsString)
         {
             _tag = dicomTag;
-            _tagAsString = (dicomTag!=null)? dicomTag.ToString() : "";
-            _tagInWords = (dicomTag!=null)? dicomTag.DictionaryEntry.Name : "";
-            if (isSequence)
+            _tagAsString = (dicomTag != null) ? dicomTag.ToString() : "";
+            _tagInWords = (dicomTag != null) ? dicomTag.DictionaryEntry.Name : "";
+
+            // is it a sequence?
+            IsSequence = valueRepresentationContains(Tag, FellowOakDicom.DicomVR.SQ);
+            if (IsSequence)
             {
-                _valueOfTagAsString = "sequence";
+                _valueOfTagAsString = "sequence (TODO - context menu to expand?)";
             }
             else
             {
                 _valueOfTagAsString = valueOfTagAsString;
             }
         }
+
+        // HELPERS
+        public bool valueRepresentationContains(DicomTag? dicomTag, FellowOakDicom.DicomVR valueRepresentation)
+        {
+            bool isVR = false;
+
+            FellowOakDicom.DicomVR[] valueRepresentations = new DicomVR[1] { FellowOakDicom.DicomVR.NONE };
+            if (dicomTag != null)
+            {
+                valueRepresentations = dicomTag.DictionaryEntry.ValueRepresentations;
+                foreach (var vr in valueRepresentations)
+                {
+                    isVR = isVR || (vr == valueRepresentation);
+                }
+            }
+            return isVR;
+        }
+
     }
 }
