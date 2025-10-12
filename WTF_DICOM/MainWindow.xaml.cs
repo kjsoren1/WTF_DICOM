@@ -25,7 +25,7 @@ public partial class MainWindow
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
     }
 
-    void CellClick(object sender, RoutedEventArgs e)
+    public void CellClick(object sender, RoutedEventArgs e)
     {
         if (sender != null)
         {

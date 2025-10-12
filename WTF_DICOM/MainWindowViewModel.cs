@@ -41,7 +41,6 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     public DataGrid? MyDataGrid { get; set; }
 
-    //public ICommand DataGridContextMenuCommand { get; }
 
     public MainWindowViewModel()
     {
@@ -106,6 +105,16 @@ public partial class MainWindowViewModel : ObservableRecipient
         Clipboard.SetText(dicomFileCommon.DicomFileName);
 
 
+    }
+
+    [RelayCommand]
+    public void ShowAllTags(DicomFileCommon dicomFileCommon)
+    {
+        // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
+
+        TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(dicomFileCommon.TagsAndValuesList);
+        TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
+        tagsAndValuesWindow.Show();
     }
    
     //private void CopyToClipboard(DataGridCell dataGridCell)

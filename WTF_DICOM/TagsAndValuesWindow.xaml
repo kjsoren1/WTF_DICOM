@@ -1,0 +1,41 @@
+﻿<Window x:Class="WTF_DICOM.TagsAndValuesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WTF_DICOM" xmlns:models="clr-namespace:WTF_DICOM.Models" d:DataContext="{d:DesignInstance Type=models:DicomFileCommon}"
+        mc:Ignorable="d"
+        Title="TagsAndValuesWindow" Height="580" Width="800">
+  <Grid>
+    <Grid.RowDefinitions>
+      <!--Menu-->
+      <RowDefinition Height="auto" />
+      <!--Toolbar/Searchbar-->
+      <RowDefinition Height="auto" />
+      <!--Header-->
+      <RowDefinition Height="auto" />
+      <!--Content-->
+      <RowDefinition Height="*" />
+      <!--Margin-->
+      <RowDefinition Height="1" />
+    </Grid.RowDefinitions>
+
+    <!--Content - List of tags and values-->
+    <DataGrid Grid.Row="3"
+              ItemsSource="{Binding TagsAndValuesList}"
+              x:Name="TagsAndValuesDataGrid"
+              AutoGenerateColumns="False"
+              VerticalScrollBarVisibility="Visible"
+              HorizontalScrollBarVisibility="Visible"
+              IsReadOnly="True"
+              AlternationCount="2" AlternatingRowBackground="DarkViolet">
+      <DataGrid.Columns>
+        <DataGridTextColumn Binding="{Binding TagAsString}" Header="Dicom Tag {Group, Element}" />
+        <DataGridTextColumn Binding="{Binding TagInWords}" Header="Dicom Tag Name" />
+        <DataGridTextColumn Binding="{Binding ValueOfTagAsString}" Header="Value" />
+      </DataGrid.Columns>
+
+    </DataGrid>
+
+  </Grid>
+</Window>

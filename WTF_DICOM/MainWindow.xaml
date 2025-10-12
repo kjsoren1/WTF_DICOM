@@ -106,12 +106,12 @@
         
         <DataGrid.ContextMenu>
           <ContextMenu>
-            <MenuItem Header="Copy To Clipboard"
+            <MenuItem Header="Copy Cell To Clipboard"
                       Command="{Binding CopyToClipboardCommand}"
                       CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
             <MenuItem Header="Show all Tags"
-                      Command="{Binding PlaceHolderCommand}"
-                      CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                      Command="{Binding ShowAllTagsCommand}"
+                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
             <MenuItem Header="Show in Folder"
                       Command="{Binding PlaceHolderCommand}"
                       CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}}" />
