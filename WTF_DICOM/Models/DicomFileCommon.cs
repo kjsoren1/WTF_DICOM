@@ -23,6 +23,8 @@ namespace WTF_DICOM.Models
         private string? _SOPInstanceUID = "instanceUIDToBe";
 
         public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; } = new();
+        public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
+        public List<DicomTag> ColumnsToDisplay { get; set; } = new();
 
         private DicomFile? _openedFile;
         public DicomFile OpenedFile
@@ -40,6 +42,28 @@ namespace WTF_DICOM.Models
             _dicomFileName = dicomFileName;
             ReadSOPInstanceUIDFromFile();
             ReadAllTags();
+        }
+
+        public void SetItemsToDisplay()
+        {
+            ItemsToDisplay.Clear();
+            foreach (var colTag in ColumnsToDisplay)
+            {
+                string value = "";
+                try
+                {
+                    value = OpenedFile.Dataset.GetString(colTag);
+                }
+                catch (Exception ex)
+                {
+                    // value = tag.ToString();
+                    // value=ex.Message;
+                }               
+
+                WTFDicomItem wtfDicomItem =  new WTFDicomItem(colTag, value);
+                ItemsToDisplay.Add(wtfDicomItem);
+            }
+
         }
 
         private void ReadSOPInstanceUIDFromFile()

@@ -17,10 +17,11 @@ public partial class MainWindow
     
 
     public MainWindow(MainWindowViewModel viewModel)
-    {
-        DataContext = _viewModel = viewModel;
-        viewModel.MyDataGrid = DicomFileCommonDataGrid;
+    {        
         InitializeComponent();
+
+        DataContext = _viewModel = viewModel;
+        viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);
 
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
     }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data.Common;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,6 +15,7 @@ using Microsoft.Win32;
 
 using WTF_DICOM.Models;
 
+using static MaterialDesignThemes.Wpf.Theme;
 using static MaterialDesignThemes.Wpf.Theme.ToolBar;
 
 namespace WTF_DICOM;
@@ -36,20 +38,66 @@ public partial class MainWindowViewModel : ObservableRecipient
     private string? _directorySelected = "dirToBe";
 
     public ObservableCollection<DicomFileCommon> DicomFiles { get; } = new();
+
+    public List<DicomTag> ColumnsToDisplay { get; } = new();
+    private Dictionary<string, DataGridColumn> DynamicColumns { get; } = new Dictionary<string, DataGridColumn>();
     
     public int LastSelectedCellColumnIndex { get; set; } = 0; // set in MainWindow CellClick()
 
-    public DataGrid? MyDataGrid { get; set; }
+    public System.Windows.Controls.DataGrid? MyDataGrid { get; set; }
 
 
     public MainWindowViewModel()
     {
+        InitializeDefaultColumnsToDisplay();
     }
 
-
-    public MainWindowViewModel(DataGrid dataGrid) : base()
+    public void SetDataGridAndColumns(System.Windows.Controls.DataGrid dataGrid)
     {
         MyDataGrid = dataGrid;
+        MyDataGrid.Columns.Clear();
+        foreach (var dcmFile in DicomFiles)
+        {
+            dcmFile.ColumnsToDisplay = ColumnsToDisplay;
+            dcmFile.SetItemsToDisplay();
+        }
+        MyDataGrid.ItemsSource = DicomFiles;
+        UpdateDataGridColumns();
+    }
+
+    
+    protected void UpdateDataGridColumns()
+    {
+        if ( MyDataGrid == null ) return; 
+
+        foreach (var col in DynamicColumns.Values)
+        {
+            MyDataGrid.Columns.Remove(col);
+        }
+        DynamicColumns.Clear();
+
+        int idx = 0;
+        foreach (var colTag in ColumnsToDisplay)
+        {
+            var column = new DataGridTextColumn() {
+                Header = colTag.DictionaryEntry.Name,
+                Binding = new Binding($"ItemsToDisplay[{idx}].ValueOfTagAsString")
+            };
+
+            MyDataGrid.Columns.Add(column);
+            DynamicColumns.Add(colTag.DictionaryEntry.Name, column);
+            ++idx;
+        }
+    }
+
+    private void InitializeDefaultColumnsToDisplay()
+    {
+        ColumnsToDisplay.Clear();
+        ColumnsToDisplay.Add(DicomTag.Modality);
+        ColumnsToDisplay.Add(DicomTag.SOPInstanceUID);
+        ColumnsToDisplay.Add(DicomTag.PatientID);
+        ColumnsToDisplay.Add(DicomTag.RTImageName);
+        ColumnsToDisplay.Add(DicomTag.RTPlanName);
     }
 
 
@@ -87,8 +135,13 @@ public partial class MainWindowViewModel : ObservableRecipient
             FileSelected = fileDialog.FileName;
 
             DicomFiles.Clear();
-            DicomFiles.Add(new DicomFileCommon(fileDialog.FileName));
+            var fileToAdd = new DicomFileCommon(fileDialog.FileName);
+            fileToAdd.ColumnsToDisplay = ColumnsToDisplay;
+            fileToAdd.SetItemsToDisplay();
+            DicomFiles.Add(fileToAdd);
+
         }
+        UpdateDataGridColumns();
     }
 
     [RelayCommand]
@@ -108,7 +161,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void ShowAllTags(DicomFileCommon dicomFileCommon)
+    public static void ShowAllTags(DicomFileCommon dicomFileCommon)
     {
         // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
 

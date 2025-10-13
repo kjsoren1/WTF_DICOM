@@ -85,7 +85,7 @@
                 CanUserSortColumns="False"
                 SelectionMode="Single" SelectionUnit="Cell"
                 AlternationCount="2" AlternatingRowBackground="AliceBlue">
-        <DataGrid.Columns>
+        <!--<DataGrid.Columns>
           <DataGridCheckBoxColumn Header="Select" />
           <DataGridTemplateColumn Header="Filename">
             <DataGridTemplateColumn.CellTemplate>
@@ -102,7 +102,7 @@
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
           <DataGridTextColumn Binding="{Binding SOPInstanceUID}" Header="SOPInstanceUID" />
-        </DataGrid.Columns>
+        </DataGrid.Columns>-->
         
         <DataGrid.ContextMenu>
           <ContextMenu>
