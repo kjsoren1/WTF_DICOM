@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Common;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -96,7 +98,7 @@ public partial class MainWindowViewModel : ObservableRecipient
         ColumnsToDisplay.Add(DicomTag.Modality);
         ColumnsToDisplay.Add(DicomTag.SOPInstanceUID);
         ColumnsToDisplay.Add(DicomTag.PatientID);
-        ColumnsToDisplay.Add(DicomTag.RTImageName);
+        ColumnsToDisplay.Add(DicomTag.PatientName);
         ColumnsToDisplay.Add(DicomTag.RTPlanName);
     }
 
@@ -117,7 +119,15 @@ public partial class MainWindowViewModel : ObservableRecipient
         bool? result = folderDialog.ShowDialog();
         if (result == true) {
             DirectorySelected = folderDialog.FolderName;
-            //NotifyOfPropertyChange(() => DirectorySelected);
+
+            DicomFiles.Clear();
+
+            // add all files in this directory to DicomFiles
+            foreach (string fileName in Directory.EnumerateFiles(DirectorySelected))
+            {
+                AddFileToDicomFiles(fileName);
+            }
+
         }
     }
 
@@ -135,29 +145,24 @@ public partial class MainWindowViewModel : ObservableRecipient
             FileSelected = fileDialog.FileName;
 
             DicomFiles.Clear();
-            var fileToAdd = new DicomFileCommon(fileDialog.FileName);
-            fileToAdd.ColumnsToDisplay = ColumnsToDisplay;
-            fileToAdd.SetItemsToDisplay();
-            DicomFiles.Add(fileToAdd);
+            AddFileToDicomFiles(FileSelected);
 
         }
         UpdateDataGridColumns();
     }
 
+    private void AddFileToDicomFiles(string fileName)
+    {
+        var fileToAdd = new DicomFileCommon(fileName);
+        fileToAdd.ColumnsToDisplay = ColumnsToDisplay;
+        fileToAdd.SetItemsToDisplay();
+        DicomFiles.Add(fileToAdd);
+    }
+
     [RelayCommand]
     public void CopyToClipboard(DicomFileCommon dicomFileCommon)
     {
-
-        //// Get the cell content (e.g., a TextBlock)
-        //var cellContent = column.GetCellContent(item) as System.Windows.Controls.TextBlock;
-        //if (cellContent != null)
-        //{
-        //    Clipboard.SetText(cellContent.Text);
-        //}
-
-        Clipboard.SetText(dicomFileCommon.DicomFileName);
-
-
+        Clipboard.SetText(dicomFileCommon.ItemsToDisplay[LastSelectedCellColumnIndex].ValueOfTagAsString);
     }
 
     [RelayCommand]
@@ -169,11 +174,15 @@ public partial class MainWindowViewModel : ObservableRecipient
         TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
         tagsAndValuesWindow.Show();
     }
-   
-    //private void CopyToClipboard(DataGridCell dataGridCell)
-    //{
-    //    Clipboard.SetText(dataGridCell.);
-    //}
+
+    [RelayCommand]
+    public static void ShowInFolder(DicomFileCommon dicomFileCommon)
+    {
+        if (dicomFileCommon == null || dicomFileCommon.DicomFileName == null) return;
+        string fileToShow = dicomFileCommon.DicomFileName;
+        //Process.Start("explorer.exe", $"/select,\"{fileToShow}\"");
+        Helpers.ShowSelectedInExplorer.FileOrFolder(fileToShow);
+    }
 
     [RelayCommand]
     private void PlaceHolder()

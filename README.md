@@ -1,41 +1,22 @@
-# WPF app template
-This template creates a full WPF application, along with unit tests.
+# WTF_DICOM
 
-## Template
-Create a new app in your current directory by running.
+# TODOS
+ - multi-select of rows
+ - allow user to add a tag to display
+   - allow user to remove tags from display
+   - allow user to save a display as template
+ - make the scrollbar work right
+ - make delineation between columns more clear
+ - allow user to expand a sequence
+   - if it's a sequence of references allow to click into the reference if it exists in this directory
+   - otherwise is there a consistent thing to display?
+ - implement hardcoded basic filter
+   - allow use to select a tag to filter on
+   
 
-```cli
-> dotnet new keboo.wpf
-```
 
-### Parameters
-[Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `--pipeline` | CI/CD provider to use. Options: `github`, `azuredevops` | `github` |
-| `--sln` | Use legacy .sln format instead of .slnx format | `false` |
-
-**Example with Azure DevOps:**
-```cli
-> dotnet new keboo.wpf --pipeline azuredevops
-```
-
-**Example with legacy .sln format:**
-```cli
-> dotnet new keboo.wpf --sln true
-```
-
-## Updating .NET Version
-
-This template uses a `global.json` file to specify the required .NET SDK version. To update the .NET SDK version:
-
-1. Update the `global.json` file in the solution root
-2. Update the `<TargetFramework>` in the `csproj` files.
-
-## Key Features
-
-### Generic Host Dependency Injection
+# Stuff from the keboo template:
 [Docs](https://learn.microsoft.com/dotnet/core/extensions/generic-host?tabs=appbuilder&WT.mc_id=DT-MVP-5003472)
 
 ### Centralized Package Management

@@ -26,13 +26,22 @@ namespace WTF_DICOM.Models
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
         public List<DicomTag> ColumnsToDisplay { get; set; } = new();
 
+        public bool IsDicomFile { get; private set; } = true;
+
         private DicomFile? _openedFile;
-        public DicomFile OpenedFile
+        public DicomFile? OpenedFile
         {
             get { 
-                if (_openedFile == null)
+                if (_openedFile == null && IsDicomFile)
                 {
-                    _openedFile = DicomFile.Open(DicomFileName);
+                    try
+                    {
+                        _openedFile = DicomFile.Open(DicomFileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        IsDicomFile = false;
+                    }
                 }
                 return _openedFile; }
         }
@@ -52,7 +61,10 @@ namespace WTF_DICOM.Models
                 string value = "";
                 try
                 {
-                    value = OpenedFile.Dataset.GetString(colTag);
+                    if (IsDicomFile && OpenedFile != null)
+                    {
+                        value = OpenedFile.Dataset.GetString(colTag);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -68,7 +80,10 @@ namespace WTF_DICOM.Models
 
         private void ReadSOPInstanceUIDFromFile()
         {
-            SOPInstanceUID = OpenedFile.Dataset.GetString(DicomTag.SOPInstanceUID);
+            if (OpenedFile != null)
+            {
+                SOPInstanceUID = OpenedFile.Dataset.GetString(DicomTag.SOPInstanceUID);
+            }
         }
 
         public List<DicomTag> DumpAllTagsToList()
@@ -84,6 +99,8 @@ namespace WTF_DICOM.Models
 
         public void ReadAllTags()
         {
+            if (OpenedFile == null) return; 
+
             TagsAndValuesList.Clear();
             foreach (var dicomItem in OpenedFile.Dataset)
             {

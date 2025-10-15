@@ -7,19 +7,20 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=False}"
         Style="{StaticResource MaterialDesignWindow}"
-        Title="WTF DICOM" Height="450" Width="800">
+        Title="WTF DICOM" Height="500" Width="800">
   <Grid>
     <Grid.RowDefinitions>
       <!--Menu-->
-      <RowDefinition Height="auto" />
+      <RowDefinition Height="30" />
       <!--Toolbar-->
-      <RowDefinition Height="auto" />
+      <RowDefinition Height="20" />
       <!--Content-->
-      <RowDefinition Height="auto" />
+      <RowDefinition Height="450" />
     </Grid.RowDefinitions>
 
     <!--Menu-->
-    <Menu Margin="5,5,5,5" MinWidth="200" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" IsMainMenu="True">
+    <Menu Margin="0,0,0,0" MinWidth="200" Grid.Row="0" Grid.Column="0" 
+          HorizontalAlignment="Left" VerticalAlignment="Top" IsMainMenu="True">
       <MenuItem Header="_File" MinWidth="100">
         <MenuItem Header="Select Directory" Command="{Binding SelectDirectoryCommand}" />
         <MenuItem Header="Select File" Command="{Binding SelectFileCommand}" />
@@ -46,8 +47,8 @@
         <ColumnDefinition Width="20" />
       </Grid.ColumnDefinitions>
       <Grid.RowDefinitions>
-        <RowDefinition Height="40" />
-        <RowDefinition Height="auto" />
+        <RowDefinition Height="10" />
+        <RowDefinition Height="520" />
         <RowDefinition Height="auto" />
         <RowDefinition Height="auto" />
         <RowDefinition Height="auto" />
@@ -81,10 +82,10 @@
                 CanUserDeleteRows="False"
                 CanUserAddRows="False"
                 CanUserReorderColumns="False"
-                CanUserResizeColumns="False"
+                CanUserResizeColumns="True"
                 CanUserSortColumns="False"
                 SelectionMode="Single" SelectionUnit="Cell"
-                AlternationCount="2" AlternatingRowBackground="AliceBlue">
+                AlternationCount="2" AlternatingRowBackground="DarkViolet">
         <!--<DataGrid.Columns>
           <DataGridCheckBoxColumn Header="Select" />
           <DataGridTemplateColumn Header="Filename">
@@ -113,8 +114,8 @@
                       Command="{Binding ShowAllTagsCommand}"
                       CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
             <MenuItem Header="Show in Folder"
-                      Command="{Binding PlaceHolderCommand}"
-                      CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                      Command="{Binding ShowInFolderCommand}"
+                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
           </ContextMenu>
         </DataGrid.ContextMenu>
 
