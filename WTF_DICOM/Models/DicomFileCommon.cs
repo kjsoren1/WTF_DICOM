@@ -20,11 +20,21 @@ namespace WTF_DICOM.Models
 
         [ObservableProperty]
         [NotifyPropertyChangedRecipients]
+        private string? _Modality = "modalityToBe";
+
+        [ObservableProperty]
+        [NotifyPropertyChangedRecipients]
         private string? _SOPInstanceUID = "instanceUIDToBe";
+
+        [ObservableProperty]
+        [NotifyPropertyChangedRecipients]
+        private string? _SeriesInstanceUID = "seriesUIDToBe";
 
         public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; } = new();
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
         public List<DicomTag> ColumnsToDisplay { get; set; } = new();
+        public List<DicomFileCommon> ReferencedOrRelatedDicomFiles { get; } = new();
+
 
         public bool IsDicomFile { get; private set; } = true;
 
@@ -49,8 +59,10 @@ namespace WTF_DICOM.Models
         public DicomFileCommon(string? dicomFileName)
         {
             _dicomFileName = dicomFileName;
+            ReadModalityFromFile();
             ReadSOPInstanceUIDFromFile();
-            ReadAllTags();
+            ReadSeriesInstanceUIDFromFile();
+            //ReadAllTags();
         }
 
         public void SetItemsToDisplay()
@@ -64,6 +76,19 @@ namespace WTF_DICOM.Models
                     if (IsDicomFile && OpenedFile != null)
                     {
                         value = OpenedFile.Dataset.GetString(colTag);
+                        WTFDicomItem wtfDicomItem = new WTFDicomItem(colTag, value);
+                        if (wtfDicomItem.IsSequence)
+                        {
+                            var seq = OpenedFile.Dataset.GetSequence(colTag);
+                            if (seq != null)
+                            {
+                                foreach (var item in seq.Items)
+                                {
+                                    // do something
+                                }
+                            }
+                        }
+                        ItemsToDisplay.Add(wtfDicomItem);
                     }
                 }
                 catch (Exception ex)
@@ -72,10 +97,18 @@ namespace WTF_DICOM.Models
                     // value=ex.Message;
                 }               
 
-                WTFDicomItem wtfDicomItem =  new WTFDicomItem(colTag, value);
-                ItemsToDisplay.Add(wtfDicomItem);
+                
+                
             }
 
+        }
+
+        private void ReadModalityFromFile()
+        {
+            if (OpenedFile != null)
+            {
+                Modality = OpenedFile.Dataset.GetString(DicomTag.Modality);
+            }
         }
 
         private void ReadSOPInstanceUIDFromFile()
@@ -83,6 +116,14 @@ namespace WTF_DICOM.Models
             if (OpenedFile != null)
             {
                 SOPInstanceUID = OpenedFile.Dataset.GetString(DicomTag.SOPInstanceUID);
+            }
+        }
+
+        private void ReadSeriesInstanceUIDFromFile()
+        {
+            if (OpenedFile != null)
+            {
+                SeriesInstanceUID = OpenedFile.Dataset.GetString(DicomTag.SeriesInstanceUID);
             }
         }
 

@@ -26,6 +26,15 @@ namespace WTF_DICOM.Models
         [ObservableProperty]
         private bool _isSequence = false;
 
+        [ObservableProperty]
+        private DicomSequence? _dcmSequence = null;
+
+        [ObservableProperty]
+        private bool _isReference = false;
+
+        [ObservableProperty]
+        private bool _isSelected = false;
+
 
         public WTFDicomItem(DicomTag? dicomTag, string? valueOfTagAsString)
         {
@@ -35,14 +44,25 @@ namespace WTF_DICOM.Models
 
             // is it a sequence?
             IsSequence = valueRepresentationContains(Tag, FellowOakDicom.DicomVR.SQ);
+            
             if (IsSequence)
             {
-                _valueOfTagAsString = "sequence (TODO - context menu to expand?)";
+                IsReference = isReferencedSequence();
+                if (IsReference)
+                {
+                    _valueOfTagAsString = "referenced sequence (TODO - context menu to expand?)";
+                }
+                else
+                {
+                    _valueOfTagAsString = "sequence (TODO - context menu to expand?)";
+                }
+                
             }
             else
             {
                 _valueOfTagAsString = valueOfTagAsString;
             }
+            
         }
 
         // HELPERS
@@ -60,6 +80,11 @@ namespace WTF_DICOM.Models
                 }
             }
             return isVR;
+        }
+
+        public bool isReferencedSequence()
+        {
+            return TagInWords.Contains("Referenced");
         }
 
     }

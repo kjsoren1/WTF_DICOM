@@ -153,10 +153,25 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     private void AddFileToDicomFiles(string fileName)
     {
-        var fileToAdd = new DicomFileCommon(fileName);
-        fileToAdd.ColumnsToDisplay = ColumnsToDisplay;
-        fileToAdd.SetItemsToDisplay();
-        DicomFiles.Add(fileToAdd);
+        DicomFileCommon fileToAdd = new DicomFileCommon(fileName);
+
+        DicomFileCommon? existingFile = null;
+
+        // check if this is a CT and already in the list
+        //if (fileToAdd.Modality.Equals("CT") || fileToAdd.Modality.Equals("SPECT"))
+        {
+            existingFile = FindSeriesInList(fileToAdd);
+        }
+
+        if (existingFile != null) {  
+            existingFile.ReferencedOrRelatedDicomFiles.Add(fileToAdd);
+        }
+        else
+        {
+            fileToAdd.ColumnsToDisplay = ColumnsToDisplay;
+            fileToAdd.SetItemsToDisplay();
+            DicomFiles.Add(fileToAdd);
+        }
     }
 
     [RelayCommand]
@@ -188,6 +203,22 @@ public partial class MainWindowViewModel : ObservableRecipient
     private void PlaceHolder()
     {
 
+    }
+
+    // helpers
+    private DicomFileCommon? FindSeriesInList(DicomFileCommon? dicomFile)
+    {
+        if (dicomFile == null) return null;
+        string? seriesUID = dicomFile.SeriesInstanceUID;
+        if (seriesUID == null) return null;
+
+        foreach (var dcmFile in DicomFiles)
+        {
+            if(seriesUID.Equals(dcmFile.SeriesInstanceUID))
+                return dcmFile;
+        }
+
+        return null;
     }
 
 }

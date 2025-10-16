@@ -12,6 +12,9 @@
    - otherwise is there a consistent thing to display?
  - implement hardcoded basic filter
    - allow use to select a tag to filter on
+ - allow collapse of CT files
+   - display number of files in series for all files
+ - and checkbox to the rows
    
 
 
