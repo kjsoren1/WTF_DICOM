@@ -30,10 +30,27 @@ namespace WTF_DICOM.Models
         [NotifyPropertyChangedRecipients]
         private string? _SeriesInstanceUID = "seriesUIDToBe";
 
-        public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; } = new();
+        //private ObservableCollection<WTFDicomItem> _tagsAndValuesList;
+        public ObservableCollection<WTFDicomItem> TagsAndValuesList
+        {
+            get;
+            //{
+            //    if (_tagsAndValuesList == null)
+            //    {
+            //        _tagsAndValuesList = new ObservableCollection<WTFDicomItem>();
+            //    }
+
+            //    if (_tagsAndValuesList.Count == 0)
+            //    {
+            //        ReadAllTags();
+            //    }
+            //    return _tagsAndValuesList;
+            //}
+        }
+
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
         public List<DicomTag> ColumnsToDisplay { get; set; } = new();
-        public List<DicomFileCommon> ReferencedOrRelatedDicomFiles { get; } = new();
+        public ObservableCollection<DicomFileCommon> ReferencedOrRelatedDicomFiles { get; } = new();
 
 
         public bool IsDicomFile { get; private set; } = true;
@@ -59,6 +76,8 @@ namespace WTF_DICOM.Models
         public DicomFileCommon(string? dicomFileName)
         {
             _dicomFileName = dicomFileName;
+            TagsAndValuesList = new ObservableCollection<WTFDicomItem>();
+
             ReadModalityFromFile();
             ReadSOPInstanceUIDFromFile();
             ReadSeriesInstanceUIDFromFile();

@@ -78,6 +78,8 @@
                 ItemsSource="{Binding DicomFiles}"
                 x:Name="DicomFileCommonDataGrid"
                 AutoGenerateColumns="False"
+                VerticalScrollBarVisibility="Visible"
+                HorizontalScrollBarVisibility="Visible"
                 IsReadOnly="True"
                 CanUserDeleteRows="False"
                 CanUserAddRows="False"
@@ -104,7 +106,7 @@
           </DataGridTemplateColumn>
           <DataGridTextColumn Binding="{Binding SOPInstanceUID}" Header="SOPInstanceUID" />
         </DataGrid.Columns>-->
-        
+
         <DataGrid.ContextMenu>
           <ContextMenu>
             <MenuItem Header="Copy Cell To Clipboard"
@@ -115,6 +117,9 @@
                       CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
             <MenuItem Header="Show in Folder"
                       Command="{Binding ShowInFolderCommand}"
+                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
+            <MenuItem Header="Show Related Files"
+                      Command="{Binding ShowRelatedFilesCommand}"
                       CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
           </ContextMenu>
         </DataGrid.ContextMenu>

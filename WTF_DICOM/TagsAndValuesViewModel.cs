@@ -21,7 +21,6 @@ namespace WTF_DICOM
     public partial class TagsAndValuesViewModel : ObservableRecipient
     {
 
-
         public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; } = new();
         public int LastSelectedCellColumnIndex { get; set; } = 0; // set in TagsAndValuesViewWindow CellClick()
         public DataGrid? MyDataGrid { get; set; }
@@ -29,11 +28,6 @@ namespace WTF_DICOM
         public TagsAndValuesViewModel(ObservableCollection<WTFDicomItem> tagsAndValuesList)
         {
             TagsAndValuesList = tagsAndValuesList;
-        }
-
-        public TagsAndValuesViewModel(DataGrid dataGrid) : base()
-        {
-            MyDataGrid = dataGrid;
         }
 
     }

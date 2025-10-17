@@ -40,6 +40,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     private string? _directorySelected = "dirToBe";
 
     public ObservableCollection<DicomFileCommon> DicomFiles { get; } = new();
+    public ICollectionView DicomFilesView { get; }
 
     public List<DicomTag> ColumnsToDisplay { get; } = new();
     private Dictionary<string, DataGridColumn> DynamicColumns { get; } = new Dictionary<string, DataGridColumn>();
@@ -52,6 +53,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     public MainWindowViewModel()
     {
         InitializeDefaultColumnsToDisplay();
+        DicomFilesView = CollectionViewSource.GetDefaultView(DicomFiles);
     }
 
     public void SetDataGridAndColumns(System.Windows.Controls.DataGrid dataGrid)
@@ -172,7 +174,11 @@ public partial class MainWindowViewModel : ObservableRecipient
             fileToAdd.SetItemsToDisplay();
             DicomFiles.Add(fileToAdd);
         }
+
+        //FilterByModality("RTPLAN");
     }
+
+   
 
     [RelayCommand]
     public void CopyToClipboard(DicomFileCommon dicomFileCommon)
@@ -184,10 +190,18 @@ public partial class MainWindowViewModel : ObservableRecipient
     public static void ShowAllTags(DicomFileCommon dicomFileCommon)
     {
         // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
-
+        dicomFileCommon.ReadAllTags();
         TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(dicomFileCommon.TagsAndValuesList);
         TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
         tagsAndValuesWindow.Show();
+    }
+
+    [RelayCommand]
+    public static void ShowRelatedFiles(DicomFileCommon dicomFileCommon)
+    {
+        SimpleDicomFilesViewModel simpleViewModel = new SimpleDicomFilesViewModel(dicomFileCommon.ReferencedOrRelatedDicomFiles);
+        SimpleDicomFilesWindow simpleDicomFilesWindow = new SimpleDicomFilesWindow(simpleViewModel);
+        simpleDicomFilesWindow.Show();
     }
 
     [RelayCommand]
@@ -205,7 +219,7 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     }
 
-    // helpers
+    // HELPERS
     private DicomFileCommon? FindSeriesInList(DicomFileCommon? dicomFile)
     {
         if (dicomFile == null) return null;
@@ -219,6 +233,16 @@ public partial class MainWindowViewModel : ObservableRecipient
         }
 
         return null;
+    }
+
+    private void FilterByModality(string modality)
+    {
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase;
+        DicomFilesView.Filter = df =>
+        {
+            DicomFileCommon? item = df as DicomFileCommon;
+            return item != null && item.Modality != null && item.Modality.Equals(modality,comparison);
+        };
     }
 
 }

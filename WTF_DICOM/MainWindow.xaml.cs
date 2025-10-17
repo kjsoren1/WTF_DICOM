@@ -13,15 +13,14 @@ namespace WTF_DICOM;
 /// </summary>
 public partial class MainWindow
 {
-    private readonly MainWindowViewModel _viewModel;
-    
+    private readonly MainWindowViewModel _viewModel;    
 
     public MainWindow(MainWindowViewModel viewModel)
-    {        
+    {
         InitializeComponent();
 
         DataContext = _viewModel = viewModel;
-        viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);
+        viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);       
 
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
     }

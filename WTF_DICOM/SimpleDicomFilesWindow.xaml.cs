@@ -18,24 +18,21 @@ using WTF_DICOM.Models;
 namespace WTF_DICOM
 {
     /// <summary>
-    /// Interaction logic for TagsAndValuesWindow.xaml
+    /// Interaction logic for SimpleDicomFilesViewModel.xaml
     /// </summary>
-    public partial class TagsAndValuesWindow : Window
+    public partial class SimpleDicomFilesWindow : Window
     {
+        private readonly SimpleDicomFilesViewModel _viewModel;
         
-        private readonly TagsAndValuesViewModel _viewModel;
-
-        public TagsAndValuesWindow(TagsAndValuesViewModel viewModel)
-        {            
+        public SimpleDicomFilesWindow(SimpleDicomFilesViewModel viewModel)
+        {
             InitializeComponent();
 
             DataContext = _viewModel = viewModel;
-            viewModel.MyDataGrid = TagsAndValuesDataGrid;
+            viewModel.MyDataGrid = SimpleDicomFilesDataGrid;
 
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
         }
-
-
 
         public void CellClick(object sender, RoutedEventArgs e)
         {
@@ -52,3 +49,4 @@ namespace WTF_DICOM
         }
     }
 }
+
