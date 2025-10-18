@@ -80,6 +80,22 @@ public partial class MainWindowViewModel : ObservableRecipient
         }
         DynamicColumns.Clear();
 
+        // Select checkbox and number related files listed first
+        {
+            var col_1 = new DataGridCheckBoxColumn() {
+                Header = "Select",
+                Binding = new Binding($"Selected"),
+                IsReadOnly = false
+            };
+            MyDataGrid.Columns.Add(col_1);
+
+            var col_2 = new DataGridTextColumn() {
+                Header = "Count",
+                Binding = new Binding($"NumberRelatedFiles")
+            };
+            MyDataGrid.Columns.Add(col_2);
+        }
+
         int idx = 0;
         foreach (var colTag in ColumnsToDisplay)
         {
@@ -224,12 +240,18 @@ public partial class MainWindowViewModel : ObservableRecipient
     {
         if (dicomFile == null) return null;
         string? seriesUID = dicomFile.SeriesInstanceUID;
+        string? modality = dicomFile.Modality;
         if (seriesUID == null) return null;
 
         foreach (var dcmFile in DicomFiles)
         {
-            if(seriesUID.Equals(dcmFile.SeriesInstanceUID))
-                return dcmFile;
+            if (seriesUID.Equals(dcmFile.SeriesInstanceUID))
+            {
+                if (modality != null && modality.Equals(dcmFile.Modality))
+                {
+                    return dcmFile;
+                }
+            }
         }
 
         return null;

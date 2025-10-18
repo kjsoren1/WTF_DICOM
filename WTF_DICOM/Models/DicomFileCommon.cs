@@ -30,27 +30,28 @@ namespace WTF_DICOM.Models
         [NotifyPropertyChangedRecipients]
         private string? _SeriesInstanceUID = "seriesUIDToBe";
 
-        //private ObservableCollection<WTFDicomItem> _tagsAndValuesList;
+        public int NumberRelatedFiles
+        {
+            get
+            {
+                return ReferencedOrRelatedDicomFiles.Count + 1;
+            }
+        }
+
+        [ObservableProperty]
+        [NotifyPropertyChangedRecipients]
+        private bool _selected = false;
+
         public ObservableCollection<WTFDicomItem> TagsAndValuesList
         {
             get;
-            //{
-            //    if (_tagsAndValuesList == null)
-            //    {
-            //        _tagsAndValuesList = new ObservableCollection<WTFDicomItem>();
-            //    }
-
-            //    if (_tagsAndValuesList.Count == 0)
-            //    {
-            //        ReadAllTags();
-            //    }
-            //    return _tagsAndValuesList;
-            //}
         }
 
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
         public List<DicomTag> ColumnsToDisplay { get; set; } = new();
         public ObservableCollection<DicomFileCommon> ReferencedOrRelatedDicomFiles { get; } = new();
+
+        
 
 
         public bool IsDicomFile { get; private set; } = true;
