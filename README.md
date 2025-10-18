@@ -12,10 +12,14 @@
    - otherwise is there a consistent thing to display?
  - implement hardcoded basic filter
    - allow use to select a tag to filter on
- - allow collapse of CT files
-   - display number of files in series for all files
- - and checkbox to the rows
-   
+ - allow collapse of CT files PARTIALLY DONE (always collapses)
+   - display number of files in series for all files DONE
+ - and checkbox to the rows (DONE)
+ - right click header
+   - if select checkbox column then "select all" "de-select all"
+   - if tag column then "remove tag from display"
+   - add right-click "add tag to display" to "show all tags"
+ - add "save display as template" to main menu
 
 
 
