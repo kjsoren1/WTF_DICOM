@@ -30,12 +30,36 @@
               VerticalScrollBarVisibility="Visible"
               HorizontalScrollBarVisibility="Visible"
               IsReadOnly="True"
+              SelectionMode="Single" SelectionUnit="Cell"
               AlternationCount="2" AlternatingRowBackground="DarkViolet">
       <DataGrid.Columns>
         <DataGridTextColumn Binding="{Binding TagAsString}" Header="Dicom Tag {Group, Element}" />
         <DataGridTextColumn Binding="{Binding TagInWords}" Header="Dicom Tag Name" />
         <DataGridTextColumn Binding="{Binding ValueOfTagAsString}" Header="Value" />
       </DataGrid.Columns>
+
+      <DataGrid.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="Copy Cell To Clipboard"
+                    Command="{Binding CopyToClipboardCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
+          <MenuItem Header="Show Referenced Files"
+                    Command="{Binding ShowReferencedFilesCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
+          <MenuItem Header="Show Sequence"
+                    Command="{Binding ShowSequenceCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
+          <MenuItem Header="Add Tag to Display"
+                    Command="{Binding AddTagToDisplayCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
+        </ContextMenu>
+      </DataGrid.ContextMenu>
+
+      <DataGrid.CellStyle>
+        <Style TargetType="{x:Type DataGridCell}">
+          <EventSetter Event="GotFocus" Handler="CellClick"/>
+        </Style>
+      </DataGrid.CellStyle>
 
     </DataGrid>
 

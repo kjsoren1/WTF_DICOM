@@ -90,35 +90,44 @@ namespace WTF_DICOM.Models
             ItemsToDisplay.Clear();
             foreach (var colTag in ColumnsToDisplay)
             {
-                string value = "";
-                try
+                AddItemToDisplay(colTag);
+            }
+        }
+
+        public void AddItemToDisplay(DicomTag colTag)
+        {
+            //ColumnsToDisplay.Add(colTag); // I think this is already done
+
+            string value = "";
+            try
+            {
+                if (IsDicomFile && OpenedFile != null)
                 {
-                    if (IsDicomFile && OpenedFile != null)
+                    value = OpenedFile.Dataset.GetString(colTag);
+                    WTFDicomItem wtfDicomItem = new WTFDicomItem(colTag, value);
+                    if (wtfDicomItem.IsSequence)
                     {
-                        value = OpenedFile.Dataset.GetString(colTag);
-                        WTFDicomItem wtfDicomItem = new WTFDicomItem(colTag, value);
-                        if (wtfDicomItem.IsSequence)
+                        var seq = OpenedFile.Dataset.GetSequence(colTag);
+                        if (seq != null)
                         {
-                            var seq = OpenedFile.Dataset.GetSequence(colTag);
-                            if (seq != null)
+                            foreach (var item in seq.Items)
                             {
-                                foreach (var item in seq.Items)
-                                {
-                                    // do something
-                                }
+                                // do something
                             }
                         }
-                        ItemsToDisplay.Add(wtfDicomItem);
                     }
+                    ItemsToDisplay.Add(wtfDicomItem);
                 }
-                catch (Exception ex)
+                else
                 {
-                    // value = tag.ToString();
-                    // value=ex.Message;
-                }               
-
-                
-                
+                    WTFDicomItem wtfDicomItem = new WTFDicomItem(colTag, "");
+                    ItemsToDisplay.Add(wtfDicomItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                WTFDicomItem wtfDicomItem = new WTFDicomItem(colTag, "");
+                ItemsToDisplay.Add(wtfDicomItem);
             }
 
         }

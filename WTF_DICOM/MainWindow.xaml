@@ -86,7 +86,7 @@
                 CanUserReorderColumns="False"
                 CanUserResizeColumns="True"
                 CanUserSortColumns="False"
-                SelectionMode="Single" SelectionUnit="Cell"
+                SelectionMode="Single" SelectionUnit="CellOrRowHeader"
                 AlternationCount="2" AlternatingRowBackground="DarkViolet">
         <!--<DataGrid.Columns>
           <DataGridCheckBoxColumn Header="Select" />

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -66,10 +67,28 @@ public partial class MainWindowViewModel : ObservableRecipient
             dcmFile.SetItemsToDisplay();
         }
         MyDataGrid.ItemsSource = DicomFiles;
+
+        // Select checkbox and number related files listed first
+        var col_1 = new DataGridCheckBoxColumn()
+        {
+            Header = "Select",
+            Binding = new Binding($"Selected"),
+            IsReadOnly = false
+        };
+        MyDataGrid.Columns.Add(col_1);
+        DynamicColumns.Add("STATIC_COLUMN_Select", col_1);
+
+        var col_2 = new DataGridTextColumn()
+        {
+            Header = "Count",
+            Binding = new Binding($"NumberRelatedFiles")
+        };
+        MyDataGrid.Columns.Add(col_2);
+        DynamicColumns.Add("STATIC_COLUMN_Count", col_2);
+
         UpdateDataGridColumns();
     }
 
-    
     protected void UpdateDataGridColumns()
     {
         if ( MyDataGrid == null ) return; 
@@ -79,22 +98,6 @@ public partial class MainWindowViewModel : ObservableRecipient
             MyDataGrid.Columns.Remove(col);
         }
         DynamicColumns.Clear();
-
-        // Select checkbox and number related files listed first
-        {
-            var col_1 = new DataGridCheckBoxColumn() {
-                Header = "Select",
-                Binding = new Binding($"Selected"),
-                IsReadOnly = false
-            };
-            MyDataGrid.Columns.Add(col_1);
-
-            var col_2 = new DataGridTextColumn() {
-                Header = "Count",
-                Binding = new Binding($"NumberRelatedFiles")
-            };
-            MyDataGrid.Columns.Add(col_2);
-        }
 
         int idx = 0;
         foreach (var colTag in ColumnsToDisplay)
@@ -117,7 +120,26 @@ public partial class MainWindowViewModel : ObservableRecipient
         ColumnsToDisplay.Add(DicomTag.SOPInstanceUID);
         ColumnsToDisplay.Add(DicomTag.PatientID);
         ColumnsToDisplay.Add(DicomTag.PatientName);
-        ColumnsToDisplay.Add(DicomTag.RTPlanName);
+        ColumnsToDisplay.Add(DicomTag.RTPlanLabel);
+    }
+
+    public void AddColumnToDisplay(DicomTag tag)
+    {
+        ColumnsToDisplay.Add(tag);
+        foreach (var dcmFile in DicomFiles)
+        {
+            dcmFile.AddItemToDisplay(tag);
+        }        
+
+        int idx = ColumnsToDisplay.Count-1;
+        var column = new DataGridTextColumn()
+        {
+            Header = tag.DictionaryEntry.Name,
+            Binding = new Binding($"ItemsToDisplay[{idx}].ValueOfTagAsString")
+        };
+       
+        MyDataGrid.Columns.Add(column);
+        DynamicColumns.Add(tag.DictionaryEntry.Name, column);
     }
 
 
@@ -203,11 +225,11 @@ public partial class MainWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public static void ShowAllTags(DicomFileCommon dicomFileCommon)
+    public void ShowAllTags(DicomFileCommon dicomFileCommon)
     {
         // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
         dicomFileCommon.ReadAllTags();
-        TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(dicomFileCommon.TagsAndValuesList);
+        TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
         TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
         tagsAndValuesWindow.Show();
     }

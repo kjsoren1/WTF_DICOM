@@ -20,15 +20,33 @@ namespace WTF_DICOM
 {
     public partial class TagsAndValuesViewModel : ObservableRecipient
     {
+        private readonly DicomFileCommon _parent;
+        private MainWindowViewModel _mainWindowViewModel;
 
         public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; } = new();
         public int LastSelectedCellColumnIndex { get; set; } = 0; // set in TagsAndValuesViewWindow CellClick()
         public DataGrid? MyDataGrid { get; set; }
 
-        public TagsAndValuesViewModel(ObservableCollection<WTFDicomItem> tagsAndValuesList)
+        public TagsAndValuesViewModel(MainWindowViewModel mwvm, DicomFileCommon dicomFile)
         {
-            TagsAndValuesList = tagsAndValuesList;
+            _parent = dicomFile;
+            _mainWindowViewModel = mwvm;
+            TagsAndValuesList = dicomFile.TagsAndValuesList;
         }
 
+
+        [RelayCommand]
+        public void CopyToClipboard(WTFDicomItem tag)
+        {
+            Clipboard.SetText(tag.ValueOfTagAsString);
+        }
+
+        [RelayCommand]
+        public void AddTagToDisplay(WTFDicomItem tag)
+        {
+            if (tag == null) return;
+            // send info to mainWindowViewModel...
+            _mainWindowViewModel.AddColumnToDisplay(tag.Tag);
+        }
     }
 }

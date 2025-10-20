@@ -14,11 +14,11 @@
    - allow use to select a tag to filter on
  - allow collapse of CT files PARTIALLY DONE (always collapses)
    - display number of files in series for all files DONE
- - and checkbox to the rows (DONE)
+   - and checkbox to the rows (DONE)
  - right click header
    - if select checkbox column then "select all" "de-select all"
    - if tag column then "remove tag from display"
-   - add right-click "add tag to display" to "show all tags"
+   - add right-click "add tag to display" to "show all tags" DONE
  - add "save display as template" to main menu
 
 
