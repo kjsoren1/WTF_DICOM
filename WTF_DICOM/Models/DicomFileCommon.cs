@@ -129,7 +129,15 @@ namespace WTF_DICOM.Models
                 WTFDicomItem wtfDicomItem = new WTFDicomItem(colTag, "");
                 ItemsToDisplay.Add(wtfDicomItem);
             }
+        }
 
+        public void RemoveItemToDisplay(DicomTag colTag, int idx)
+        {
+            WTFDicomItem toRemove = ItemsToDisplay[idx];
+            if (toRemove != null && toRemove.Tag.Equals(colTag))
+            {
+                ItemsToDisplay.RemoveAt(idx);
+            }
         }
 
         private void ReadModalityFromFile()

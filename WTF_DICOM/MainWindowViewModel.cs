@@ -57,6 +57,156 @@ public partial class MainWindowViewModel : ObservableRecipient
         DicomFilesView = CollectionViewSource.GetDefaultView(DicomFiles);
     }
 
+    ////This is using the source generators from CommunityToolkit.Mvvm to generate a RelayCommand
+    ////See: https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/generators/relaycommand
+    ////and: https://learn.microsoft.com/windows/communitytoolkit/mvvm/relaycommand
+
+    [RelayCommand]
+    //private async Task SelectDirectoryAsync() {
+    private void SelectDirectory() {
+        OpenFolderDialog folderDialog = new OpenFolderDialog {
+            Title = "Select Folder",
+            InitialDirectory = DirectorySelected
+        };
+
+
+        bool? result = folderDialog.ShowDialog();
+        if (result == true) {
+            DirectorySelected = folderDialog.FolderName;
+
+            DicomFiles.Clear();
+
+            // add all files in this directory to DicomFiles
+            foreach (string fileName in Directory.EnumerateFiles(DirectorySelected))
+            {
+                AddFileToDicomFiles(fileName);
+            }
+
+        }
+    }
+
+    //[RelayCommand(IncludeCancelCommand = false)]
+    [RelayCommand]
+    //private async Task SelectFileAsync(CancellationToken token) {
+    private void SelectFile() {
+        OpenFileDialog fileDialog = new OpenFileDialog {
+            Title = "Select File",
+            InitialDirectory = DirectorySelected
+        };
+
+        bool? result = fileDialog.ShowDialog();
+        if (result == true) {
+            FileSelected = fileDialog.FileName;
+
+            DicomFiles.Clear();
+            AddFileToDicomFiles(FileSelected);
+
+        }
+        UpdateDataGridColumns();
+    }
+
+    [RelayCommand]
+    public void CopyToClipboard(DicomFileCommon dicomFileCommon)
+    {
+        Clipboard.SetText(dicomFileCommon.ItemsToDisplay[LastSelectedCellColumnIndex].ValueOfTagAsString);
+    }
+
+    [RelayCommand]
+    public void ShowAllTags(DicomFileCommon dicomFileCommon)
+    {
+        // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
+        dicomFileCommon.ReadAllTags();
+        TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
+        TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
+        tagsAndValuesWindow.Show();
+    }
+
+    [RelayCommand]
+    public static void ShowRelatedFiles(DicomFileCommon dicomFileCommon)
+    {
+        SimpleDicomFilesViewModel simpleViewModel = new SimpleDicomFilesViewModel(dicomFileCommon.ReferencedOrRelatedDicomFiles);
+        SimpleDicomFilesWindow simpleDicomFilesWindow = new SimpleDicomFilesWindow(simpleViewModel);
+        simpleDicomFilesWindow.Show();
+    }
+
+    [RelayCommand]
+    public static void ShowInFolder(DicomFileCommon dicomFileCommon)
+    {
+        if (dicomFileCommon == null || dicomFileCommon.DicomFileName == null) return;
+        string fileToShow = dicomFileCommon.DicomFileName;
+        //Process.Start("explorer.exe", $"/select,\"{fileToShow}\"");
+        Helpers.ShowSelectedInExplorer.FileOrFolder(fileToShow);
+    }
+
+    [RelayCommand]
+    public void RemoveColumnFromDisplay(DicomFileCommon dicomFileCommon)
+    {
+        int colToRemove = LastSelectedCellColumnIndex;
+        DicomTag colTag = ColumnsToDisplay[colToRemove];
+        RemoveColumnFromDisplayHelper(colTag);
+    }
+
+    [RelayCommand]
+    private void PlaceHolder()
+    {
+
+    }
+
+    
+
+    // HELPERS
+    private DicomFileCommon? FindSeriesWSameModalityInList(DicomFileCommon? dicomFile)
+    {
+        if (dicomFile == null) return null;
+        string? seriesUID = dicomFile.SeriesInstanceUID;
+        string? modality = dicomFile.Modality;
+        if (seriesUID == null) return null;
+
+        foreach (var dcmFile in DicomFiles)
+        {
+            if (seriesUID.Equals(dcmFile.SeriesInstanceUID))
+            {
+                if (modality != null && modality.Equals(dcmFile.Modality))
+                {
+                    return dcmFile;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private void FilterByModality(string modality)
+    {
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase;
+        DicomFilesView.Filter = df =>
+        {
+            DicomFileCommon? item = df as DicomFileCommon;
+            return item != null && item.Modality != null && item.Modality.Equals(modality,comparison);
+        };
+    }
+
+    private void AddFileToDicomFiles(string fileName)
+    {
+        DicomFileCommon fileToAdd = new DicomFileCommon(fileName);
+        DicomFileCommon? existingFile = null;
+
+        existingFile = FindSeriesWSameModalityInList(fileToAdd);
+
+        if (existingFile != null)
+        {
+            existingFile.ReferencedOrRelatedDicomFiles.Add(fileToAdd);
+        }
+        else
+        {
+            fileToAdd.ColumnsToDisplay = ColumnsToDisplay;
+            fileToAdd.SetItemsToDisplay();
+            DicomFiles.Add(fileToAdd);
+        }
+
+        //FilterByModality("RTPLAN");
+    }
+
     public void SetDataGridAndColumns(System.Windows.Controls.DataGrid dataGrid)
     {
         MyDataGrid = dataGrid;
@@ -88,7 +238,7 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         UpdateDataGridColumns();
     }
-
+    
     protected void UpdateDataGridColumns()
     {
         if ( MyDataGrid == null ) return; 
@@ -142,151 +292,19 @@ public partial class MainWindowViewModel : ObservableRecipient
         DynamicColumns.Add(tag.DictionaryEntry.Name, column);
     }
 
-
-    ////This is using the source generators from CommunityToolkit.Mvvm to generate a RelayCommand
-    ////See: https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/generators/relaycommand
-    ////and: https://learn.microsoft.com/windows/communitytoolkit/mvvm/relaycommand
-
-    [RelayCommand]
-    //private async Task SelectDirectoryAsync() {
-    private void SelectDirectory() {
-        OpenFolderDialog folderDialog = new OpenFolderDialog {
-            Title = "Select Folder",
-            InitialDirectory = DirectorySelected
-        };
-
-
-        bool? result = folderDialog.ShowDialog();
-        if (result == true) {
-            DirectorySelected = folderDialog.FolderName;
-
-            DicomFiles.Clear();
-
-            // add all files in this directory to DicomFiles
-            foreach (string fileName in Directory.EnumerateFiles(DirectorySelected))
-            {
-                AddFileToDicomFiles(fileName);
-            }
-
-        }
-    }
-
-    //[RelayCommand(IncludeCancelCommand = false)]
-    [RelayCommand]
-    //private async Task SelectFileAsync(CancellationToken token) {
-    private void SelectFile() {
-        OpenFileDialog fileDialog = new OpenFileDialog {
-            Title = "Select File",
-            InitialDirectory = DirectorySelected
-        };
-
-        bool? result = fileDialog.ShowDialog();
-        if (result == true) {
-            FileSelected = fileDialog.FileName;
-
-            DicomFiles.Clear();
-            AddFileToDicomFiles(FileSelected);
-
-        }
-        UpdateDataGridColumns();
-    }
-
-    private void AddFileToDicomFiles(string fileName)
+    public void RemoveColumnFromDisplayHelper(DicomTag tag)
     {
-        DicomFileCommon fileToAdd = new DicomFileCommon(fileName);
-
-        DicomFileCommon? existingFile = null;
-
-        // check if this is a CT and already in the list
-        //if (fileToAdd.Modality.Equals("CT") || fileToAdd.Modality.Equals("SPECT"))
-        {
-            existingFile = FindSeriesInList(fileToAdd);
-        }
-
-        if (existingFile != null) {  
-            existingFile.ReferencedOrRelatedDicomFiles.Add(fileToAdd);
-        }
-        else
-        {
-            fileToAdd.ColumnsToDisplay = ColumnsToDisplay;
-            fileToAdd.SetItemsToDisplay();
-            DicomFiles.Add(fileToAdd);
-        }
-
-        //FilterByModality("RTPLAN");
-    }
-
-   
-
-    [RelayCommand]
-    public void CopyToClipboard(DicomFileCommon dicomFileCommon)
-    {
-        Clipboard.SetText(dicomFileCommon.ItemsToDisplay[LastSelectedCellColumnIndex].ValueOfTagAsString);
-    }
-
-    [RelayCommand]
-    public void ShowAllTags(DicomFileCommon dicomFileCommon)
-    {
-        // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
-        dicomFileCommon.ReadAllTags();
-        TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
-        TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
-        tagsAndValuesWindow.Show();
-    }
-
-    [RelayCommand]
-    public static void ShowRelatedFiles(DicomFileCommon dicomFileCommon)
-    {
-        SimpleDicomFilesViewModel simpleViewModel = new SimpleDicomFilesViewModel(dicomFileCommon.ReferencedOrRelatedDicomFiles);
-        SimpleDicomFilesWindow simpleDicomFilesWindow = new SimpleDicomFilesWindow(simpleViewModel);
-        simpleDicomFilesWindow.Show();
-    }
-
-    [RelayCommand]
-    public static void ShowInFolder(DicomFileCommon dicomFileCommon)
-    {
-        if (dicomFileCommon == null || dicomFileCommon.DicomFileName == null) return;
-        string fileToShow = dicomFileCommon.DicomFileName;
-        //Process.Start("explorer.exe", $"/select,\"{fileToShow}\"");
-        Helpers.ShowSelectedInExplorer.FileOrFolder(fileToShow);
-    }
-
-    [RelayCommand]
-    private void PlaceHolder()
-    {
-
-    }
-
-    // HELPERS
-    private DicomFileCommon? FindSeriesInList(DicomFileCommon? dicomFile)
-    {
-        if (dicomFile == null) return null;
-        string? seriesUID = dicomFile.SeriesInstanceUID;
-        string? modality = dicomFile.Modality;
-        if (seriesUID == null) return null;
+        if (tag == null) return;
+        int idx = ColumnsToDisplay.IndexOf(tag);
+        var colToRemove = DynamicColumns.GetValueOrDefault(tag.DictionaryEntry.Name);
+        MyDataGrid.Columns.Remove(colToRemove);
+        ColumnsToDisplay.Remove(tag);
+        DynamicColumns.Remove(tag.DictionaryEntry.Name);
 
         foreach (var dcmFile in DicomFiles)
         {
-            if (seriesUID.Equals(dcmFile.SeriesInstanceUID))
-            {
-                if (modality != null && modality.Equals(dcmFile.Modality))
-                {
-                    return dcmFile;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private void FilterByModality(string modality)
-    {
-        StringComparison comparison = StringComparison.OrdinalIgnoreCase;
-        DicomFilesView.Filter = df =>
-        {
-            DicomFileCommon? item = df as DicomFileCommon;
-            return item != null && item.Modality != null && item.Modality.Equals(modality,comparison);
-        };
+            dcmFile.RemoveItemToDisplay(tag, idx);
+        } 
     }
 
 }
