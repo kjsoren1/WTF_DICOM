@@ -35,7 +35,7 @@ public partial class MainWindow
         }
     }
 
-    private void DataGridContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)
+    public void DataGridContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)
     {
         int idx = -1;
         DataGridCell? cell = null;
@@ -49,7 +49,6 @@ public partial class MainWindow
         }
         // Get the element that raised the event
         FrameworkElement fe = e.Source as FrameworkElement;
-
         if (fe != null)
         {
             if (idx == -1) { return; }
@@ -63,37 +62,32 @@ public partial class MainWindow
 
             // COPY TO CLIPBOARD
             MenuItem copyToClipboardItem = new MenuItem { Header = "Copy Cell To Clipboard" };
-            var cb = new CommandBinding();
-            cb.Command = _viewModel.CopyToClipboardCommand;
-            copyToClipboardItem.CommandBindings.Add(cb);
+            copyToClipboardItem.Command = _viewModel.CopyToClipboardCommand;
+            copyToClipboardItem.CommandParameter = cell.DataContext;
             customContextMenu.Items.Add(copyToClipboardItem);
 
             // SHOW ALL TAGS
             MenuItem showAllTagsItem = new MenuItem { Header = "Show All Tags" };
-            cb = new CommandBinding();
-            cb.Command = _viewModel.ShowAllTagsCommand;
-            showAllTagsItem.CommandBindings.Add(cb);
+            showAllTagsItem.Command = _viewModel.ShowAllTagsCommand;
+            showAllTagsItem.CommandParameter = cell.DataContext;
             customContextMenu.Items.Add(showAllTagsItem);
 
             // SHOW IN FOLDER
             MenuItem showInFolderItem = new MenuItem { Header = "Show in Folder" };
-            cb = new CommandBinding();
-            cb.Command = _viewModel.ShowInFolderCommand;
-            showInFolderItem.CommandBindings.Add(cb);
+            showInFolderItem.Command = _viewModel.ShowInFolderCommand;
+            showInFolderItem.CommandParameter = cell.DataContext;
             customContextMenu.Items.Add(showInFolderItem);
 
             // SHOW RELATED FILES
             MenuItem showRelatedFilesItem = new MenuItem { Header = "Show Related Files" };
-            cb = new CommandBinding();
-            cb.Command = _viewModel.ShowRelatedFilesCommand;
-            showRelatedFilesItem.CommandBindings.Add(cb);
+            showRelatedFilesItem.Command = _viewModel.ShowRelatedFilesCommand;
+            showRelatedFilesItem.CommandParameter = cell.DataContext;
             customContextMenu.Items.Add(showRelatedFilesItem);
 
             // REMOVE COLUMN FROM DISPLAY
             MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
-            cb = new CommandBinding();
-            cb.Command = _viewModel.RemoveColumnFromDisplayCommand;
-            removeColumnFromDisplayItem.CommandBindings.Add(cb);
+            removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayCommand;
+            removeColumnFromDisplayItem.CommandParameter = cell.DataContext;
             customContextMenu.Items.Add(removeColumnFromDisplayItem);
          
 
