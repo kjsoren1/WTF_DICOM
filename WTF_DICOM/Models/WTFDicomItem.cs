@@ -15,13 +15,13 @@ namespace WTF_DICOM.Models
         private DicomTag? _tag;
 
         [ObservableProperty]
-        private string? _tagAsString;
+        private string? _tagAsString = "";
 
         [ObservableProperty]
-        private string? _tagInWords;
+        private string? _tagInWords = "";
 
         [ObservableProperty]
-        private string? _valueOfTagAsString;
+        private string? _valueOfTagAsString = "";
 
         [ObservableProperty]
         private bool _isSequence = false;
@@ -35,12 +35,38 @@ namespace WTF_DICOM.Models
         [ObservableProperty]
         private bool _isSelected = false;
 
+        [ObservableProperty]
+        private bool _isTag = true;
+
+        [ObservableProperty]
+        private string? _displayString = "";
+
+        [ObservableProperty]
+        private string? _itemDescription = "";
+
+        [ObservableProperty]
+        private int _count = 1; 
+
+        public WTFDicomItem(bool isTag, string displayString, string itemDescription)
+        {
+            _isTag = isTag;
+            _displayString = displayString;
+            _itemDescription = itemDescription;
+        }
+        public WTFDicomItem(bool isTag, int count, string itemDescription)
+        {
+            _isTag = isTag;
+            _count = count;
+            _displayString = count.ToString();
+            _itemDescription = itemDescription;
+        }
 
         public WTFDicomItem(DicomTag? dicomTag, string? valueOfTagAsString)
         {
             _tag = dicomTag;
             _tagAsString = (dicomTag != null) ? dicomTag.ToString() : "";
             _tagInWords = (dicomTag != null) ? dicomTag.DictionaryEntry.Name : "";
+            _displayString = _tagAsString;
 
             // is it a sequence?
             IsSequence = valueRepresentationContains(Tag, FellowOakDicom.DicomVR.SQ);
@@ -84,6 +110,7 @@ namespace WTF_DICOM.Models
 
         public bool isReferencedSequence()
         {
+            if (TagInWords == null) return false;
             return TagInWords.Contains("Referenced");
         }
 

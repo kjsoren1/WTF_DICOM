@@ -1,16 +1,17 @@
 # WTF_DICOM
 
 # TODOS
- - multi-select of rows
+- change how the static columns (for select and count) are handled (DONE)
+- multi-select of rows
  - allow user to add a tag to display
-   - allow user to remove tags from display
+   - allow user to remove tags from display (DONE)
    - allow user to save a display as template
  - make the scrollbar work right
  - make delineation between columns more clear
  - allow user to expand a sequence
    - if it's a sequence of references allow to click into the reference if it exists in this directory
    - otherwise is there a consistent thing to display?
- - implement hardcoded basic filter
+ - implement hardcoded basic filter (DONE)
    - allow use to select a tag to filter on
  - allow collapse of CT files PARTIALLY DONE (always collapses)
    - display number of files in series for all files DONE
@@ -18,9 +19,14 @@
  - right click header
    - if select checkbox column then "select all" "de-select all"
    - if tag column then "remove tag from display"
-   - add right-click "add tag to display" to "show all tags" DONE
+ - add right-click "add tag to display" to "show all tags" DONE
  - add "save display as template" to main menu
-
+ - make context menu programmatically so that it can be dynamic (depend on what sort of item was clicked) DONE
+   - actually implement the conditionals (STARTED)
+ - make the context menu in show all tags also be dynamic
+    - expand sequence
+# BUGS
+- right-click select of headers still doesn't work
 
 
 # Stuff from the keboo template:

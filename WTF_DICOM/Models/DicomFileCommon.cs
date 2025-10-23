@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 using FellowOakDicom;
+
+using static WTF_DICOM.MainWindowViewModel;
 
 namespace WTF_DICOM.Models
 {
@@ -48,7 +50,8 @@ namespace WTF_DICOM.Models
         }
 
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
-        public List<DicomTag> ColumnsToDisplay { get; set; } = new();
+        public List<DicomTag> TagColumnsToDisplay { get; set; } = new();
+        public List<NonTagColumnTypes> NonTagColumnsToDisplay { get; set; } = new();
         public ObservableCollection<DicomFileCommon> ReferencedOrRelatedDicomFiles { get; } = new();
 
         
@@ -88,7 +91,26 @@ namespace WTF_DICOM.Models
         public void SetItemsToDisplay()
         {
             ItemsToDisplay.Clear();
-            foreach (var colTag in ColumnsToDisplay)
+            foreach (var item in NonTagColumnsToDisplay)
+            {
+                WTFDicomItem wtfItem = null;
+                switch (item)
+                {
+                    case (MainWindowViewModel.NonTagColumnTypes.COUNT):
+                        wtfItem =
+                            new WTFDicomItem(false, ReferencedOrRelatedDicomFiles.Count + 1,
+                            MainWindowViewModel.NonTagColumnTypeDictionary.GetValueOrDefault(MainWindowViewModel.NonTagColumnTypes.COUNT, "Count"));
+                        break;
+                    case (MainWindowViewModel.NonTagColumnTypes.SELECT):
+                        string label = MainWindowViewModel.NonTagColumnTypeDictionary.GetValueOrDefault(MainWindowViewModel.NonTagColumnTypes.SELECT, "Select");
+                        wtfItem =
+                            new WTFDicomItem(false, label, label);
+                        break;
+                }
+                if (wtfItem != null) { ItemsToDisplay.Add(wtfItem); }
+            }
+
+            foreach (var colTag in TagColumnsToDisplay)
             {
                 AddItemToDisplay(colTag);
             }

@@ -43,7 +43,19 @@ public partial class MainWindowViewModel : ObservableRecipient
     public ObservableCollection<DicomFileCommon> DicomFiles { get; } = new();
     public ICollectionView DicomFilesView { get; }
 
-    public List<DicomTag> ColumnsToDisplay { get; } = new();
+    public List<DicomTag> TagColumnsToDisplay { get; } = new();
+
+    public List<NonTagColumnTypes> NonTagColumnsToDisplay { get; } = new();
+    public enum NonTagColumnTypes
+    {
+        COUNT,
+        SELECT
+    }
+    public static Dictionary<NonTagColumnTypes, string> NonTagColumnTypeDictionary { get; } =
+        new Dictionary<NonTagColumnTypes, string>
+        { { NonTagColumnTypes.COUNT, "Count" },
+          { NonTagColumnTypes.SELECT, "Select" } };
+
     private Dictionary<string, DataGridColumn> DynamicColumns { get; } = new Dictionary<string, DataGridColumn>();
     
     public int LastSelectedCellColumnIndex { get; set; } = 0; // set in MainWindow CellClick()
@@ -69,7 +81,6 @@ public partial class MainWindowViewModel : ObservableRecipient
             InitialDirectory = DirectorySelected
         };
 
-
         bool? result = folderDialog.ShowDialog();
         if (result == true) {
             DirectorySelected = folderDialog.FolderName;
@@ -79,7 +90,12 @@ public partial class MainWindowViewModel : ObservableRecipient
             // add all files in this directory to DicomFiles
             foreach (string fileName in Directory.EnumerateFiles(DirectorySelected))
             {
-                AddFileToDicomFiles(fileName);
+                AddFileToDicomFiles(fileName, false);
+            }
+            // delay setting items to display so that the related file count is correct
+            foreach (var dcmFile in DicomFiles)
+            {
+                dcmFile.SetItemsToDisplay();
             }
 
         }
@@ -99,7 +115,7 @@ public partial class MainWindowViewModel : ObservableRecipient
             FileSelected = fileDialog.FileName;
 
             DicomFiles.Clear();
-            AddFileToDicomFiles(FileSelected);
+            AddFileToDicomFiles(FileSelected, true);
 
         }
         UpdateDataGridColumns();
@@ -142,9 +158,17 @@ public partial class MainWindowViewModel : ObservableRecipient
     public void RemoveColumnFromDisplay(DicomFileCommon dicomFileCommon)
     {
         int colToRemove = LastSelectedCellColumnIndex;
-        DicomTag colTag = ColumnsToDisplay[colToRemove];
+        DicomTag colTag = TagColumnsToDisplay[colToRemove];
         RemoveColumnFromDisplayHelper(colTag);
     }
+
+    [RelayCommand]
+    public void RemoveColumnFromDisplay2(int colToRemove)
+    {
+        DicomTag colTag = TagColumnsToDisplay[colToRemove - NonTagColumnsToDisplay.Count];
+        RemoveColumnFromDisplayHelper(colTag);
+    }
+
 
     [RelayCommand]
     private void PlaceHolder()
@@ -186,7 +210,7 @@ public partial class MainWindowViewModel : ObservableRecipient
         };
     }
 
-    private void AddFileToDicomFiles(string fileName)
+    private void AddFileToDicomFiles(string fileName, bool refreshDisplay)
     {
         DicomFileCommon fileToAdd = new DicomFileCommon(fileName);
         DicomFileCommon? existingFile = null;
@@ -199,8 +223,9 @@ public partial class MainWindowViewModel : ObservableRecipient
         }
         else
         {
-            fileToAdd.ColumnsToDisplay = ColumnsToDisplay;
-            fileToAdd.SetItemsToDisplay();
+            fileToAdd.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
+            fileToAdd.TagColumnsToDisplay = TagColumnsToDisplay;
+            if (refreshDisplay) fileToAdd.SetItemsToDisplay();
             DicomFiles.Add(fileToAdd);
         }
 
@@ -211,30 +236,14 @@ public partial class MainWindowViewModel : ObservableRecipient
     {
         MyDataGrid = dataGrid;
         MyDataGrid.Columns.Clear();
+        MyDataGrid.SelectionUnit=DataGridSelectionUnit.CellOrRowHeader;
         foreach (var dcmFile in DicomFiles)
         {
-            dcmFile.ColumnsToDisplay = ColumnsToDisplay;
+            dcmFile.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
+            dcmFile.TagColumnsToDisplay = TagColumnsToDisplay;
             dcmFile.SetItemsToDisplay();
         }
         MyDataGrid.ItemsSource = DicomFiles;
-
-        // Select checkbox and number related files listed first
-        var col_1 = new DataGridCheckBoxColumn()
-        {
-            Header = "Select",
-            Binding = new Binding($"Selected"),
-            IsReadOnly = false
-        };
-        MyDataGrid.Columns.Add(col_1);
-        DynamicColumns.Add("STATIC_COLUMN_Select", col_1);
-
-        var col_2 = new DataGridTextColumn()
-        {
-            Header = "Count",
-            Binding = new Binding($"NumberRelatedFiles")
-        };
-        MyDataGrid.Columns.Add(col_2);
-        DynamicColumns.Add("STATIC_COLUMN_Count", col_2);
 
         UpdateDataGridColumns();
     }
@@ -245,15 +254,48 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         foreach (var col in DynamicColumns.Values)
         {
-            MyDataGrid.Columns.Remove(col);
+            if (col.DisplayIndex > 1)
+            {
+                MyDataGrid.Columns.Remove(col);
+            }
         }
         DynamicColumns.Clear();
 
         int idx = 0;
-        foreach (var colTag in ColumnsToDisplay)
+        foreach (var item in NonTagColumnsToDisplay)
+        {
+            if (item == NonTagColumnTypes.SELECT)
+            {
+                string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.SELECT, "Select");
+                var column = new DataGridCheckBoxColumn() {
+                    Header = new TextBlock() { Text = headerString },
+                    Binding = new Binding($"ItemsToDisplay[{idx}].IsSelected"),
+                    IsReadOnly = false
+                };
+
+                MyDataGrid.Columns.Add(column);
+                DynamicColumns.Add(headerString, column);
+                ++idx;
+            }
+
+            if (item == NonTagColumnTypes.COUNT)
+            {
+                string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.COUNT, "Count");
+                var column = new DataGridTextColumn() {
+                    Header = new TextBlock() { Text = headerString },
+                    Binding = new Binding($"ItemsToDisplay[{idx}].Count")
+                };
+
+                MyDataGrid.Columns.Add(column);
+                DynamicColumns.Add(headerString, column);
+                ++idx;
+            }
+        }
+
+        foreach (var colTag in TagColumnsToDisplay)
         {
             var column = new DataGridTextColumn() {
-                Header = colTag.DictionaryEntry.Name,
+                Header = new TextBlock() { Text = colTag.DictionaryEntry.Name },
                 Binding = new Binding($"ItemsToDisplay[{idx}].ValueOfTagAsString")
             };
 
@@ -265,23 +307,27 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     private void InitializeDefaultColumnsToDisplay()
     {
-        ColumnsToDisplay.Clear();
-        ColumnsToDisplay.Add(DicomTag.Modality);
-        ColumnsToDisplay.Add(DicomTag.SOPInstanceUID);
-        ColumnsToDisplay.Add(DicomTag.PatientID);
-        ColumnsToDisplay.Add(DicomTag.PatientName);
-        ColumnsToDisplay.Add(DicomTag.RTPlanLabel);
+        TagColumnsToDisplay.Clear();
+        TagColumnsToDisplay.Add(DicomTag.Modality);
+        TagColumnsToDisplay.Add(DicomTag.SOPInstanceUID);
+        TagColumnsToDisplay.Add(DicomTag.PatientID);
+        TagColumnsToDisplay.Add(DicomTag.PatientName);
+        TagColumnsToDisplay.Add(DicomTag.RTPlanLabel);
+
+        NonTagColumnsToDisplay.Clear();
+        NonTagColumnsToDisplay.Add(NonTagColumnTypes.SELECT);
+        NonTagColumnsToDisplay.Add(NonTagColumnTypes.COUNT);
     }
 
     public void AddColumnToDisplay(DicomTag tag)
     {
-        ColumnsToDisplay.Add(tag);
+        TagColumnsToDisplay.Add(tag);
         foreach (var dcmFile in DicomFiles)
         {
             dcmFile.AddItemToDisplay(tag);
         }        
 
-        int idx = ColumnsToDisplay.Count-1;
+        int idx = TagColumnsToDisplay.Count-1;
         var column = new DataGridTextColumn()
         {
             Header = tag.DictionaryEntry.Name,
@@ -295,10 +341,18 @@ public partial class MainWindowViewModel : ObservableRecipient
     public void RemoveColumnFromDisplayHelper(DicomTag tag)
     {
         if (tag == null) return;
-        int idx = ColumnsToDisplay.IndexOf(tag);
+        int idx = TagColumnsToDisplay.IndexOf(tag);
+        if (idx > 0)
+        {
+            idx += NonTagColumnsToDisplay.Count;
+        }
+        else
+        {
+            return; // can't currently remove the non-tag columns
+        }
         var colToRemove = DynamicColumns.GetValueOrDefault(tag.DictionaryEntry.Name);
         MyDataGrid.Columns.Remove(colToRemove);
-        ColumnsToDisplay.Remove(tag);
+        TagColumnsToDisplay.Remove(tag);
         DynamicColumns.Remove(tag.DictionaryEntry.Name);
 
         foreach (var dcmFile in DicomFiles)

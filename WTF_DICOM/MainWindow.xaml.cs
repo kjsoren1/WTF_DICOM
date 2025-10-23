@@ -1,7 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 
 using CommunityToolkit.Mvvm.Input;
 
@@ -35,73 +37,121 @@ public partial class MainWindow
         }
     }
 
+    private bool IsHeader(ContextMenuEventArgs e)
+    {
+        DependencyObject dep = (DependencyObject)e.OriginalSource;
+        while ((dep != null) && !(dep is DataGridCell) && !(dep is DataGridColumnHeader))
+        {
+            dep = VisualTreeHelper.GetParent(dep);
+        }
+        return (dep != null && dep is DataGridColumnHeader);
+    }
     public void DataGridContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)
     {
-        int idx = -1;
-        DataGridCell? cell = null;
-        if (sender != null)
+        DependencyObject dep = (DependencyObject)e.OriginalSource;
+        while ((dep != null) && !(dep is DataGridCell) && !(dep is DataGridColumnHeader))
         {
-            cell = sender as DataGridCell;
-            if (cell != null)
+            dep = VisualTreeHelper.GetParent(dep);
+        }
+        if (dep == null) return;
+        if (dep is DataGridColumnHeader)
+        {
+            DataGridColumnHeader colHeader = dep as DataGridColumnHeader;
+            if (colHeader == null) { return; }
+            int idx = colHeader.Column.DisplayIndex;
+            // Get the element that raised the event
+            FrameworkElement fe = e.Source as FrameworkElement;
+            if (fe != null)
             {
-                idx = cell.Column.DisplayIndex;
+                // Example: Create a new ContextMenu dynamically
+                ContextMenu customContextMenu = new ContextMenu();
+                customContextMenu.DataContext = colHeader.DataContext;
+
+                if (idx >= _viewModel.NonTagColumnsToDisplay.Count)
+                {
+                    // REMOVE COLUMN FROM DISPLAY
+                    MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
+                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplay2Command;
+                    removeColumnFromDisplayItem.CommandParameter = idx;
+                    customContextMenu.Items.Add(removeColumnFromDisplayItem);
+                }
+
+                // Assign the new ContextMenu to the element
+                fe.ContextMenu = customContextMenu;
+                fe.ContextMenu.IsOpen = true;
+
+                // Optional: Mark the event as handled to prevent the default ContextMenu from opening
+                // This is particularly important if you want to completely replace a pre-existing ContextMenu.
+                // If the element initially has no ContextMenu, marking it handled might not be necessary,
+                // but it's good practice for consistency.
+                e.Handled = true;
             }
         }
-        // Get the element that raised the event
-        FrameworkElement fe = e.Source as FrameworkElement;
-        if (fe != null)
+        else if (dep is DataGridCell)
         {
-            if (idx == -1) { return; }
+            DataGridCell cell = dep as DataGridCell;
             if (cell == null) { return; }
-            
-            // Example: Create a new ContextMenu dynamically
-            ContextMenu customContextMenu = new ContextMenu();
-            customContextMenu.DataContext = cell.DataContext;
+            int idx = cell.Column.DisplayIndex;
+            // Get the element that raised the event
+            FrameworkElement fe = e.Source as FrameworkElement;
+            if (fe != null)
+            {
+                // Example: Create a new ContextMenu dynamically
+                ContextMenu customContextMenu = new ContextMenu();
+                customContextMenu.DataContext = cell.DataContext;
 
-            // Check if it's a header?????
+                // Check if it's a header?????
 
-            // COPY TO CLIPBOARD
-            MenuItem copyToClipboardItem = new MenuItem { Header = "Copy Cell To Clipboard" };
-            copyToClipboardItem.Command = _viewModel.CopyToClipboardCommand;
-            copyToClipboardItem.CommandParameter = cell.DataContext;
-            customContextMenu.Items.Add(copyToClipboardItem);
+                // COPY TO CLIPBOARD
+                MenuItem copyToClipboardItem = new MenuItem { Header = "Copy Cell To Clipboard" };
+                copyToClipboardItem.Command = _viewModel.CopyToClipboardCommand;
+                copyToClipboardItem.CommandParameter = cell.DataContext;
+                customContextMenu.Items.Add(copyToClipboardItem);
 
-            // SHOW ALL TAGS
-            MenuItem showAllTagsItem = new MenuItem { Header = "Show All Tags" };
-            showAllTagsItem.Command = _viewModel.ShowAllTagsCommand;
-            showAllTagsItem.CommandParameter = cell.DataContext;
-            customContextMenu.Items.Add(showAllTagsItem);
+                // SHOW ALL TAGS
+                MenuItem showAllTagsItem = new MenuItem { Header = "Show All Tags" };
+                showAllTagsItem.Command = _viewModel.ShowAllTagsCommand;
+                showAllTagsItem.CommandParameter = cell.DataContext;
+                customContextMenu.Items.Add(showAllTagsItem);
 
-            // SHOW IN FOLDER
-            MenuItem showInFolderItem = new MenuItem { Header = "Show in Folder" };
-            showInFolderItem.Command = _viewModel.ShowInFolderCommand;
-            showInFolderItem.CommandParameter = cell.DataContext;
-            customContextMenu.Items.Add(showInFolderItem);
+                // SHOW IN FOLDER
+                MenuItem showInFolderItem = new MenuItem { Header = "Show in Folder" };
+                showInFolderItem.Command = _viewModel.ShowInFolderCommand;
+                showInFolderItem.CommandParameter = cell.DataContext;
+                customContextMenu.Items.Add(showInFolderItem);
 
-            // SHOW RELATED FILES
-            MenuItem showRelatedFilesItem = new MenuItem { Header = "Show Related Files" };
-            showRelatedFilesItem.Command = _viewModel.ShowRelatedFilesCommand;
-            showRelatedFilesItem.CommandParameter = cell.DataContext;
-            customContextMenu.Items.Add(showRelatedFilesItem);
+                // SHOW RELATED FILES
+                MenuItem showRelatedFilesItem = new MenuItem { Header = "Show Related Files" };
+                showRelatedFilesItem.Command = _viewModel.ShowRelatedFilesCommand;
+                showRelatedFilesItem.CommandParameter = cell.DataContext;
+                customContextMenu.Items.Add(showRelatedFilesItem);
 
-            // REMOVE COLUMN FROM DISPLAY
-            MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
-            removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayCommand;
-            removeColumnFromDisplayItem.CommandParameter = cell.DataContext;
-            customContextMenu.Items.Add(removeColumnFromDisplayItem);
-         
+                //// REMOVE COLUMN FROM DISPLAY
+                //MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
+                //removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayCommand;
+                //removeColumnFromDisplayItem.CommandParameter = cell.DataContext;
+                //customContextMenu.Items.Add(removeColumnFromDisplayItem);
+
+                if (idx >= _viewModel.NonTagColumnsToDisplay.Count)
+                {
+                    // REMOVE COLUMN FROM DISPLAY
+                    MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
+                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplay2Command;
+                    removeColumnFromDisplayItem.CommandParameter = idx;
+                    customContextMenu.Items.Add(removeColumnFromDisplayItem);
+                }
+
+                // Assign the new ContextMenu to the element
+                fe.ContextMenu = customContextMenu;
+                fe.ContextMenu.IsOpen = true;
 
 
-            // Assign the new ContextMenu to the element
-            fe.ContextMenu = customContextMenu;
-            fe.ContextMenu.IsOpen = true;
-
-
-            // Optional: Mark the event as handled to prevent the default ContextMenu from opening
-            // This is particularly important if you want to completely replace a pre-existing ContextMenu.
-            // If the element initially has no ContextMenu, marking it handled might not be necessary,
-            // but it's good practice for consistency.
-            e.Handled = true; 
+                // Optional: Mark the event as handled to prevent the default ContextMenu from opening
+                // This is particularly important if you want to completely replace a pre-existing ContextMenu.
+                // If the element initially has no ContextMenu, marking it handled might not be necessary,
+                // but it's good practice for consistency.
+                e.Handled = true;
+            }
         }
     }
 
