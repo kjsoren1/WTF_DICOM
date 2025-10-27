@@ -1,6 +1,23 @@
 # WTF_DICOM
 
 # TODOS
+Templates
+ - basic template saved (save existing display as a template, load it later)
+
+Filters
+ - need "Filter"
+   - launch window with options to
+     - "Select Tags from Favorites"
+     - message to "add tags to your Favorites to use them in a filter" 
+ - need "Use Tag as Filter"
+ 
+Favorites
+ - need "Add Tag to Favorites" in "Show All Tags"
+ - launch window with options to
+   - "Edit Favorites"
+   - "Select Filter from Favorites"
+   - message to "to add a tag to Favorites, right-click and 'Show all Tags' on a file, then right-click the tag" 
+
 - change how the static columns (for select and count) are handled (DONE)
 - multi-select of rows
  - allow user to add a tag to display

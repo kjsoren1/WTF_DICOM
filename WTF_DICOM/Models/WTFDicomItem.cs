@@ -81,8 +81,7 @@ namespace WTF_DICOM.Models
                 else
                 {
                     _valueOfTagAsString = "sequence (TODO - context menu to expand?)";
-                }
-                
+                }               
             }
             else
             {

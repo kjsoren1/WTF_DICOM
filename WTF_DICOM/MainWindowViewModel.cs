@@ -4,7 +4,9 @@ using System.ComponentModel;
 using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,6 +17,7 @@ using CommunityToolkit.Mvvm.Input;
 using FellowOakDicom;
 
 using Microsoft.Win32;
+using Newtonsoft.Json;
 
 using WTF_DICOM.Models;
 
@@ -43,9 +46,9 @@ public partial class MainWindowViewModel : ObservableRecipient
     public ObservableCollection<DicomFileCommon> DicomFiles { get; } = new();
     public ICollectionView DicomFilesView { get; }
 
-    public List<DicomTag> TagColumnsToDisplay { get; } = new();
+    public List<DicomTag> TagColumnsToDisplay { get; private set; } = new();
 
-    public List<NonTagColumnTypes> NonTagColumnsToDisplay { get; } = new();
+    public List<NonTagColumnTypes> NonTagColumnsToDisplay { get; private set; } = new();
     public enum NonTagColumnTypes
     {
         COUNT,
@@ -73,8 +76,9 @@ public partial class MainWindowViewModel : ObservableRecipient
     ////See: https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/generators/relaycommand
     ////and: https://learn.microsoft.com/windows/communitytoolkit/mvvm/relaycommand
 
+    /*** MAIN MENU FUNCTIONS ***/
+
     [RelayCommand]
-    //private async Task SelectDirectoryAsync() {
     private void SelectDirectory() {
         OpenFolderDialog folderDialog = new OpenFolderDialog {
             Title = "Select Folder",
@@ -103,7 +107,6 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     //[RelayCommand(IncludeCancelCommand = false)]
     [RelayCommand]
-    //private async Task SelectFileAsync(CancellationToken token) {
     private void SelectFile() {
         OpenFileDialog fileDialog = new OpenFileDialog {
             Title = "Select File",
@@ -119,6 +122,26 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         }
         UpdateDataGridColumns();
+    }
+
+    [RelayCommand]
+    private void SaveDisplayAsTemplate()
+    {
+        DisplayTemplate toSave = new DisplayTemplate();
+        toSave.GroupsAndElements = DisplayTemplate.GetGroupsElementsFromTags(TagColumnsToDisplay);
+        toSave.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
+
+        string jsonString = JsonConvert.SerializeObject(toSave);
+        File.WriteAllText("templates.json", jsonString);
+    }
+
+    [RelayCommand]
+    private void LoadDisplayFromTemplate()
+    {
+        string loadedJson = File.ReadAllText("templates.json");
+        DisplayTemplate? toLoad = JsonConvert.DeserializeObject<DisplayTemplate>(loadedJson);
+        TagColumnsToDisplay = DisplayTemplate.GetTagsFromGroupsAndElements(toLoad.GroupsAndElements);
+        NonTagColumnsToDisplay = toLoad.NonTagColumnsToDisplay;
     }
 
     [RelayCommand]
@@ -163,7 +186,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void RemoveColumnFromDisplay2(int colToRemove)
+    public void RemoveColumnFromDisplayByIndex(int colToRemove)
     {
         DicomTag colTag = TagColumnsToDisplay[colToRemove - NonTagColumnsToDisplay.Count];
         RemoveColumnFromDisplayHelper(colTag);
@@ -248,13 +271,27 @@ public partial class MainWindowViewModel : ObservableRecipient
         UpdateDataGridColumns();
     }
     
+    public void ResetDataGridAndColumns()
+    {
+        if (MyDataGrid == null) return;
+        MyDataGrid.Columns.Clear();
+        foreach (var dcmFile in DicomFiles)
+        {
+            dcmFile.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
+            dcmFile.TagColumnsToDisplay = TagColumnsToDisplay;
+            dcmFile.SetItemsToDisplay();
+        }
+
+        UpdateDataGridColumns();
+    }
+
     protected void UpdateDataGridColumns()
     {
         if ( MyDataGrid == null ) return; 
 
         foreach (var col in DynamicColumns.Values)
         {
-            if (col.DisplayIndex > 1)
+            if (col.DisplayIndex > 1) // KJS - was this here to preserve checkbox???
             {
                 MyDataGrid.Columns.Remove(col);
             }
@@ -327,7 +364,7 @@ public partial class MainWindowViewModel : ObservableRecipient
             dcmFile.AddItemToDisplay(tag);
         }        
 
-        int idx = TagColumnsToDisplay.Count-1;
+        int idx = TagColumnsToDisplay.Count-1 + NonTagColumnsToDisplay.Count;
         var column = new DataGridTextColumn()
         {
             Header = tag.DictionaryEntry.Name,

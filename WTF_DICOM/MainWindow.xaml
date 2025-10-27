@@ -26,6 +26,11 @@
         <MenuItem Header="Select File" Command="{Binding SelectFileCommand}" />
       </MenuItem>
       <Separator/>
+      <MenuItem Header="_Options" MinWidth="100">
+        <MenuItem Header="Save Template" Command="{Binding SaveDisplayAsTemplateCommand}" />
+        <MenuItem Header="Load Template" Command="{Binding LoadDisplayFromTemplateCommand}" />
+      </MenuItem>
+      <Separator/>
       <MenuItem Header="E_xit" Command="{x:Static ApplicationCommands.Close}"/>
     </Menu>
 

@@ -71,7 +71,7 @@ public partial class MainWindow
                 {
                     // REMOVE COLUMN FROM DISPLAY
                     MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
-                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplay2Command;
+                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayByIndexCommand;
                     removeColumnFromDisplayItem.CommandParameter = idx;
                     customContextMenu.Items.Add(removeColumnFromDisplayItem);
                 }
@@ -136,7 +136,7 @@ public partial class MainWindow
                 {
                     // REMOVE COLUMN FROM DISPLAY
                     MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
-                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplay2Command;
+                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayByIndexCommand;
                     removeColumnFromDisplayItem.CommandParameter = idx;
                     customContextMenu.Items.Add(removeColumnFromDisplayItem);
                 }
