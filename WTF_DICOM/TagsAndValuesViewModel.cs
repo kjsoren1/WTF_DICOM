@@ -34,7 +34,6 @@ namespace WTF_DICOM
             TagsAndValuesList = dicomFile.TagsAndValuesList;
         }
 
-
         [RelayCommand]
         public void CopyToClipboard(WTFDicomItem tag)
         {
@@ -47,6 +46,13 @@ namespace WTF_DICOM
             if (tag == null) return;
             // send info to mainWindowViewModel...
             _mainWindowViewModel.AddColumnToDisplay(tag.Tag);
+        }
+
+        [RelayCommand]
+        public void AddTagToFavorites(WTFDicomItem tag)
+        {
+            if (tag == null) return;
+            _mainWindowViewModel.AddTagToFavorites(tag.Tag);
         }
     }
 }

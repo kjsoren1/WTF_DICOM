@@ -48,6 +48,8 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     public List<DicomTag> TagColumnsToDisplay { get; private set; } = new();
 
+    public List<DicomTag> FavoriteTagsList { get; private set; } = new();
+
     public List<NonTagColumnTypes> NonTagColumnsToDisplay { get; private set; } = new();
     public enum NonTagColumnTypes
     {
@@ -128,7 +130,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     private void SaveDisplayAsTemplate()
     {
         DisplayTemplate toSave = new DisplayTemplate();
-        toSave.GroupsAndElements = DisplayTemplate.GetGroupsElementsFromTags(TagColumnsToDisplay);
+        toSave.GroupsAndElements = Helpers.TagWrangling.GetGroupsElementsFromTags(TagColumnsToDisplay);
         toSave.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
 
         string jsonString = JsonConvert.SerializeObject(toSave);
@@ -140,7 +142,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     {
         string loadedJson = File.ReadAllText("templates.json");
         DisplayTemplate? toLoad = JsonConvert.DeserializeObject<DisplayTemplate>(loadedJson);
-        TagColumnsToDisplay = DisplayTemplate.GetTagsFromGroupsAndElements(toLoad.GroupsAndElements);
+        TagColumnsToDisplay = Helpers.TagWrangling.GetTagsFromGroupsAndElements(toLoad.GroupsAndElements);
         NonTagColumnsToDisplay = toLoad.NonTagColumnsToDisplay;
     }
 
@@ -375,7 +377,20 @@ public partial class MainWindowViewModel : ObservableRecipient
         DynamicColumns.Add(tag.DictionaryEntry.Name, column);
     }
 
-    public void RemoveColumnFromDisplayHelper(DicomTag tag)
+    public void AddTagToFavorites(DicomTag tag)
+    {
+        if (tag == null) return;
+
+        FavoriteTagsList.Add(tag);
+        // save to file immediately
+        FavoriteTags toSave = new FavoriteTags();
+        toSave.GroupsAndElements = Helpers.TagWrangling.GetGroupsElementsFromTags(FavoriteTagsList);
+        
+        string jsonString = JsonConvert.SerializeObject(toSave);
+        File.WriteAllText("favorites.json", jsonString);
+    }
+
+    public void RemoveColumnFromDisplayHelper(DicomTag tag) 
     {
         if (tag == null) return;
         int idx = TagColumnsToDisplay.IndexOf(tag);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,10 +9,10 @@ using FellowOakDicom;
 namespace WTF_DICOM
 {
     [Serializable]
-    public class DisplayTemplate
+    public class FavoriteTags
     {
-        //public List<DicomTag> TagColumnsToDisplay { get; set; } = new(); // doesn't serialize properly
         public List<Tuple<ushort, ushort>> GroupsAndElements {  get; set; } = new List<Tuple<ushort, ushort>>();
-        public List<MainWindowViewModel.NonTagColumnTypes> NonTagColumnsToDisplay { get; set; } = new();
+
+
     }
 }

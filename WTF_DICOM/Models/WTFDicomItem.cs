@@ -67,50 +67,7 @@ namespace WTF_DICOM.Models
             _tagAsString = (dicomTag != null) ? dicomTag.ToString() : "";
             _tagInWords = (dicomTag != null) ? dicomTag.DictionaryEntry.Name : "";
             _displayString = _tagAsString;
-
-            // is it a sequence?
-            IsSequence = valueRepresentationContains(Tag, FellowOakDicom.DicomVR.SQ);
-            
-            if (IsSequence)
-            {
-                IsReference = isReferencedSequence();
-                if (IsReference)
-                {
-                    _valueOfTagAsString = "referenced sequence (TODO - context menu to expand?)";
-                }
-                else
-                {
-                    _valueOfTagAsString = "sequence (TODO - context menu to expand?)";
-                }               
-            }
-            else
-            {
-                _valueOfTagAsString = valueOfTagAsString;
-            }
-            
-        }
-
-        // HELPERS
-        public bool valueRepresentationContains(DicomTag? dicomTag, FellowOakDicom.DicomVR valueRepresentation)
-        {
-            bool isVR = false;
-
-            FellowOakDicom.DicomVR[] valueRepresentations = new DicomVR[1] { FellowOakDicom.DicomVR.NONE };
-            if (dicomTag != null)
-            {
-                valueRepresentations = dicomTag.DictionaryEntry.ValueRepresentations;
-                foreach (var vr in valueRepresentations)
-                {
-                    isVR = isVR || (vr == valueRepresentation);
-                }
-            }
-            return isVR;
-        }
-
-        public bool isReferencedSequence()
-        {
-            if (TagInWords == null) return false;
-            return TagInWords.Contains("Referenced");
+            _valueOfTagAsString = valueOfTagAsString;
         }
 
     }
