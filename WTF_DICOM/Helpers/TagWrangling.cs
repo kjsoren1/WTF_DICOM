@@ -49,7 +49,7 @@ namespace WTF_DICOM.Helpers
             }
             return isVR;
         }
-        
+
         public static bool IsSequence(DicomTag dicomTag)
         {
             return Helpers.TagWrangling.valueRepresentationContains(dicomTag, FellowOakDicom.DicomVR.SQ);
@@ -58,10 +58,85 @@ namespace WTF_DICOM.Helpers
         {
             if (dicomTag == null) return false;
             if (dicomTag.DictionaryEntry == null) return false;
-            
+
             string tagInWords = dicomTag.DictionaryEntry.Name;
             if (tagInWords == null) return false;
             return tagInWords.Contains("Referenced"); // hack for now
+        }
+
+        public static string SequenceRepresentativeString(DicomSequence seq, DicomTag dicomTag)
+        {
+            string toReturn = "{";
+            foreach (DicomDataset dicomDataset in seq)
+            {
+                string name = "";
+                try
+                {
+                    name = dicomDataset.GetString(dicomTag);
+                    toReturn += name;
+                    if (!dicomDataset.Equals(seq.Last()))
+                    {
+                        toReturn += ", ";
+                    }
+                } catch (Exception ex)
+                {
+                }
+            }
+            toReturn += "}";
+            return toReturn;
+        }
+
+        public static string GetDisplayValueForSequence(DicomSequence seq, DicomTag dicomTag)
+        {
+            string value = "";
+            string tagName = "";
+            string nameInsideItem = "";
+
+            if (dicomTag.Equals(DicomTag.BeamSequence))
+            {
+                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.BeamName);
+            }
+            else if (dicomTag.Equals(DicomTag.DoseReferenceSequence))
+            {
+                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.DoseReferenceDescription);
+            }
+            else if (dicomTag.Equals(DicomTag.StructureSetROISequence))
+            {
+                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ROIName);
+            }
+            else if (dicomTag.Equals(DicomTag.ReferencedDoseSequence))
+            {
+                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ReferencedSOPInstanceUID);
+            }
+            else if (dicomTag.Equals(DicomTag.ReferencedStructureSetSequence))
+            {
+                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ReferencedSOPInstanceUID);
+            }
+            else
+            {
+                DicomDataset dicomDataset = seq.ElementAt(0);
+                foreach (DicomItem dicomItem in dicomDataset)
+                {
+                    tagName = dicomItem.Tag.DictionaryEntry.Name;
+                    StringComparison comparison = StringComparison.OrdinalIgnoreCase;
+                    if (tagName.Contains("Name", comparison))
+                    {
+                        string tempName = dicomDataset.GetString(dicomItem.Tag);
+                        if (!tempName.Equals("")) nameInsideItem = tempName;
+                    }
+                }
+            }
+
+
+            if (Helpers.TagWrangling.IsReferencedSequence(dicomTag))
+            {
+                value = "Referenced Sequence of " + seq.Count() + " items: " + nameInsideItem;
+            }
+            else
+            {
+                value = "Sequence of " + seq.Count() + " items: " + nameInsideItem;
+            }
+            return value;
         }
     }
 }

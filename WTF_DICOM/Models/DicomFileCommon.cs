@@ -135,7 +135,7 @@ namespace WTF_DICOM.Models
                     if (isSequence)
                     {
                         seq = OpenedFile.Dataset.GetSequence(colTag);
-                        value = GetDisplayValueForSequence(seq, colTag);
+                        value = Helpers.TagWrangling.GetDisplayValueForSequence(seq, colTag);
                     }
                     else
                     {
@@ -213,7 +213,7 @@ namespace WTF_DICOM.Models
                     if (isSequence)
                     {
                         seq = OpenedFile.Dataset.GetSequence(dicomTag);
-                        value = GetDisplayValueForSequence(seq, dicomTag);
+                        value = Helpers.TagWrangling.GetDisplayValueForSequence(seq, dicomTag);
                     }
                     else
                     {
@@ -232,20 +232,7 @@ namespace WTF_DICOM.Models
             }
         }
 
-        public static string GetDisplayValueForSequence(DicomSequence seq, DicomTag dicomTag)
-        {
-            string value = "";
-
-            if (Helpers.TagWrangling.IsReferencedSequence(dicomTag))
-            {
-                value = "Referenced Sequence of " + seq.Count() + " items";
-            }
-            else
-            {
-                value = "Sequence of " + seq.Count() + " items";
-            }
-            return value;
-        }
+        
 
     }
 }
