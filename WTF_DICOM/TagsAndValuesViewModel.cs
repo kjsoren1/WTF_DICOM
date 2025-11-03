@@ -66,22 +66,33 @@ namespace WTF_DICOM
         }
 
         [RelayCommand]
-        public void ShowAllTags(WTFDicomItem tag)
+        public void ShowSequence(WTFDicomItem tag)
         {
             if (tag == null) return;
-            if (!tag.IsSequence) return;
+            if (!tag.IsSequence)   return;
             // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
-            if (tag.MyDicomSequence == null)
-            {
-                
+            if (tag.MyDicomSequence == null) return;
 
+            List<WTFDicomDataset> sequenceEntries = new List<WTFDicomDataset>();
+            foreach (DicomDataset dicomDataset in tag.MyDicomSequence)
+            {
+                WTFDicomDataset dataset = new WTFDicomDataset(dicomDataset);
+                sequenceEntries.Add(dataset);
             }
-                  
-            
-            //dicomFileCommon.ReadAllTags();
-            //TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
-            //TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
-            //tagsAndValuesWindow.Show();
+
+            TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(
+                _mainWindowViewModel,
+                sequenceEntries[0].TagsAndValuesList,
+                MyDicomFileCommon,
+                tag.MyDicomSequence);
+            TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
+            tagsAndValuesWindow.Show();
+        }
+
+        [RelayCommand]
+        public void ShowReferencedFiles(WTFDicomItem tag)
+        {
+            if (tag == null) return;
         }
     }
 }
