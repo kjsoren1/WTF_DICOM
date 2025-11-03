@@ -20,7 +20,8 @@ namespace WTF_DICOM
 {
     public partial class TagsAndValuesViewModel : ObservableRecipient
     {
-        private readonly DicomFileCommon _parent;
+        private readonly DicomFileCommon MyDicomFileCommon;
+        private readonly DicomSequence? MyParentSequence;
         private MainWindowViewModel _mainWindowViewModel;
 
         public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; } = new();
@@ -29,9 +30,18 @@ namespace WTF_DICOM
 
         public TagsAndValuesViewModel(MainWindowViewModel mwvm, DicomFileCommon dicomFile)
         {
-            _parent = dicomFile;
+            MyDicomFileCommon = dicomFile;
             _mainWindowViewModel = mwvm;
-            TagsAndValuesList = dicomFile.TagsAndValuesList;
+            TagsAndValuesList = dicomFile.MyDicomDataset.TagsAndValuesList;
+        }
+
+        public TagsAndValuesViewModel(MainWindowViewModel mwvm, ObservableCollection<WTFDicomItem> tagsAndValuesList,
+                                      DicomFileCommon dicomFile, DicomSequence seq)
+        {
+            MyDicomFileCommon = dicomFile;
+            MyParentSequence = seq;
+            _mainWindowViewModel = mwvm;
+            TagsAndValuesList = tagsAndValuesList;
         }
 
         [RelayCommand]
@@ -53,6 +63,25 @@ namespace WTF_DICOM
         {
             if (tag == null) return;
             _mainWindowViewModel.AddTagToFavorites(tag.Tag);
+        }
+
+        [RelayCommand]
+        public void ShowAllTags(WTFDicomItem tag)
+        {
+            if (tag == null) return;
+            if (!tag.IsSequence) return;
+            // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
+            if (tag.MyDicomSequence == null)
+            {
+                
+
+            }
+                  
+            
+            //dicomFileCommon.ReadAllTags();
+            //TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
+            //TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
+            //tagsAndValuesWindow.Show();
         }
     }
 }

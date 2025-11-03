@@ -29,10 +29,6 @@ namespace WTF_DICOM.Models
 
         public DicomDataset MyDicomDataset { get; }
 
-        public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
-        public List<DicomTag> TagColumnsToDisplay { get; set; } = new();
-        public List<NonTagColumnTypes> NonTagColumnsToDisplay { get; set; } = new();
-
         public WTFDicomDataset(DicomDataset dicomDataset)
         {
             MyDicomDataset = dicomDataset;
@@ -42,6 +38,7 @@ namespace WTF_DICOM.Models
 
         public void ReadAllTags()
         {
+            TagsAndValuesList.Clear();
             foreach (var dicomItem in MyDicomDataset)
             {
                 DicomTag dicomTag = dicomItem.Tag;
@@ -71,9 +68,20 @@ namespace WTF_DICOM.Models
                 }
 
                 WTFDicomItem wtfDicomItem = new WTFDicomItem(dicomTag, value);
-                if (isSequence) wtfDicomItem.DcmSequence = seq;
+                if (isSequence) wtfDicomItem.MyDicomSequence = seq;
                 TagsAndValuesList.Add(wtfDicomItem);
             }
+        }
+
+        public static List<DicomTag> DumpAllTagsToList(DicomDataset dicomDataset)
+        {
+            List<DicomTag> toReturn = new List<DicomTag>();
+            foreach (var dicomItem in dicomDataset)
+            {
+                toReturn.Add(dicomItem.Tag);
+            }
+
+            return toReturn;
         }
 
     }

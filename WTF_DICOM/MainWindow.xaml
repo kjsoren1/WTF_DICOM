@@ -62,23 +62,9 @@
         <RowDefinition Height="20" />
       </Grid.RowDefinitions>
 
-      <!-- **** Column 1 **** -->
 
-      <!-- Row 0 -->
-      <!-- select all, unselect all Buttons -->
-
-      <!-- Row 1+ -->
-      <!-- Checkbox -->
-      <!-- Added Programmatically-->
-
-
-      <!-- **** Column 1 **** -->
-      <!-- Row 0 -->
-      <!-- display all, display selected Toggle -->
-
-      <!-- Row 1+ -->
-      <!-- File Names and UIDs -->
-      <!-- Added Programmatically-->
+      <!-- try using a  scrollviewer around the datagrid??? -->
+     
       <DataGrid Grid.Column="1" Grid.Row="1"
                 ItemsSource="{Binding DicomFiles}"
                 x:Name="DicomFileCommonDataGrid"
