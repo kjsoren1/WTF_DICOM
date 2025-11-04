@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WTF_DICOM"
         xmlns:models="clr-namespace:WTF_DICOM.Models"
-        d:DataContext="{d:DesignInstance Type=models:DicomFileCommon}"
+        d:DataContext="{d:DesignInstance Type=models:WTFDicomDataset}"
         mc:Ignorable="d"
         Title="TagsAndValuesWindow" Height="580" Width="800">
   <Grid>
@@ -21,6 +21,16 @@
       <!--Margin-->
       <RowDefinition Height="1" />
     </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Visibility="{Binding IsSequence}">
+      <Button Command="{Binding FirstCommand}" Content="first" />
+      <Button Command="{Binding Minus5Command}" Content="-5" />
+      <Button Command="{Binding Minus1Command}" Content="-1" />
+      <Button Command="{Binding Plus1Command}" Content="+1" />
+      <Button Command="{Binding Plus5Command}" Content="+5" />
+      <Button Command="{Binding LastCommand}" Content="last" />
+
+    </StackPanel>
 
     <!--Content - List of tags and values-->
     <DataGrid Grid.Row="3"

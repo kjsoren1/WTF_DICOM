@@ -20,28 +20,41 @@ namespace WTF_DICOM
 {
     public partial class TagsAndValuesViewModel : ObservableRecipient
     {
-        private readonly DicomFileCommon MyDicomFileCommon;
-        private readonly DicomSequence? MyParentSequence;
+        private DicomFileCommon _myDicomFileCommon;
+        private readonly DicomSequence? _myParentSequence;
         private MainWindowViewModel _mainWindowViewModel;
 
-        public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; } = new();
+        [ObservableProperty]
+        public readonly string _dicomFileName = "";
+
+        public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; private set; } = new();
+        private List<WTFDicomDataset> SequenceEntries = new List<WTFDicomDataset>();
+        public int SequenceEntryIndex = 0;
+
+        [ObservableProperty]
+        public bool _isSequence = false;
+
         public int LastSelectedCellColumnIndex { get; set; } = 0; // set in TagsAndValuesViewWindow CellClick()
         public DataGrid? MyDataGrid { get; set; }
 
         public TagsAndValuesViewModel(MainWindowViewModel mwvm, DicomFileCommon dicomFile)
         {
-            MyDicomFileCommon = dicomFile;
+            _myDicomFileCommon = dicomFile;
+            _dicomFileName = dicomFile.DicomFileName;
             _mainWindowViewModel = mwvm;
             TagsAndValuesList = dicomFile.MyDicomDataset.TagsAndValuesList;
         }
 
-        public TagsAndValuesViewModel(MainWindowViewModel mwvm, ObservableCollection<WTFDicomItem> tagsAndValuesList,
+        // use this constructor when displaying the contents of a sequence
+        public TagsAndValuesViewModel(MainWindowViewModel mwvm, List<WTFDicomDataset> sequenceEntries,
                                       DicomFileCommon dicomFile, DicomSequence seq)
         {
-            MyDicomFileCommon = dicomFile;
-            MyParentSequence = seq;
+            _myDicomFileCommon = dicomFile;
+            _myParentSequence = seq;
             _mainWindowViewModel = mwvm;
-            TagsAndValuesList = tagsAndValuesList;
+            SequenceEntries = sequenceEntries;
+            TagsAndValuesList = SequenceEntries[0].TagsAndValuesList;
+            IsSequence = true;
         }
 
         [RelayCommand]
@@ -82,8 +95,8 @@ namespace WTF_DICOM
 
             TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(
                 _mainWindowViewModel,
-                sequenceEntries[0].TagsAndValuesList,
-                MyDicomFileCommon,
+                sequenceEntries,
+                _myDicomFileCommon,
                 tag.MyDicomSequence);
             TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
             tagsAndValuesWindow.Show();
@@ -93,6 +106,48 @@ namespace WTF_DICOM
         public void ShowReferencedFiles(WTFDicomItem tag)
         {
             if (tag == null) return;
+        }
+
+        [RelayCommand]
+        public void First()
+        {
+            SequenceEntryIndex = 0;
+            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+        }
+
+        [RelayCommand]
+        public void Minus5()
+        {
+            SequenceEntryIndex = Math.Max(0, SequenceEntryIndex - 5);
+            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+        }
+
+        [RelayCommand]
+        public void Minus1()
+        {
+            SequenceEntryIndex = Math.Max(0, SequenceEntryIndex - 1);
+            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+        }
+
+        [RelayCommand]
+        public void Plus1()
+        {
+            SequenceEntryIndex = Math.Min(0, SequenceEntryIndex + 1);
+            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+        }
+
+        [RelayCommand]
+        public void Plus5()
+        {
+            SequenceEntryIndex = Math.Min(0, SequenceEntryIndex + 5);
+            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+        }
+
+        [RelayCommand]
+        public void Last()
+        {
+            SequenceEntryIndex = SequenceEntries.Count - 1;
+            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
         }
     }
 }

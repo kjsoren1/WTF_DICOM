@@ -13,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using CommunityToolkit.Mvvm.Input;
+
 using WTF_DICOM.Models;
 
 namespace WTF_DICOM
@@ -31,10 +33,13 @@ namespace WTF_DICOM
 
             DataContext = _viewModel = viewModel;
             viewModel.MyDataGrid = TagsAndValuesDataGrid;
+            if (viewModel.IsSequence)
+            {
+                // enable forward/backward navigation buttons
+            }
 
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
         }
-
 
 
         public void CellClick(object sender, RoutedEventArgs e)
