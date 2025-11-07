@@ -20,16 +20,28 @@ namespace WTF_DICOM
 {
     public partial class TagsAndValuesViewModel : ObservableRecipient
     {
-        private DicomFileCommon _myDicomFileCommon;
+        private readonly DicomFileCommon _myDicomFileCommon;
         private readonly DicomSequence? _myParentSequence;
         private MainWindowViewModel _mainWindowViewModel;
 
         [ObservableProperty]
-        public readonly string _dicomFileName = "";
+        public string _dicomFileName = "";
 
         public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; private set; } = new();
         private List<WTFDicomDataset> SequenceEntries = new List<WTFDicomDataset>();
-        public int SequenceEntryIndex = 0;
+        private int _sequenceEntryIndex = 0;
+        public int SequenceEntryIndex
+        {
+            get { return _sequenceEntryIndex; }
+            set
+            {
+                value = Math.Max(0, value);
+                value = Math.Min(value, SequenceEntries.Count-1);
+                _sequenceEntryIndex = value;
+                TagsAndValuesList = SequenceEntries[_sequenceEntryIndex].TagsAndValuesList;
+                OnPropertyChanged(nameof(TagsAndValuesList));
+            }
+        }
 
         [ObservableProperty]
         public bool _isSequence = false;
@@ -112,42 +124,36 @@ namespace WTF_DICOM
         public void First()
         {
             SequenceEntryIndex = 0;
-            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
         }
 
         [RelayCommand]
         public void Minus5()
         {
-            SequenceEntryIndex = Math.Max(0, SequenceEntryIndex - 5);
-            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+            SequenceEntryIndex -= 5;
         }
 
         [RelayCommand]
         public void Minus1()
         {
-            SequenceEntryIndex = Math.Max(0, SequenceEntryIndex - 1);
-            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+            SequenceEntryIndex -= 1;
         }
 
-        [RelayCommand]
+        [RelayCommand] 
         public void Plus1()
         {
-            SequenceEntryIndex = Math.Min(0, SequenceEntryIndex + 1);
-            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+            SequenceEntryIndex += 1;
         }
 
         [RelayCommand]
         public void Plus5()
         {
-            SequenceEntryIndex = Math.Min(0, SequenceEntryIndex + 5);
-            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
+            SequenceEntryIndex += 5;
         }
 
         [RelayCommand]
         public void Last()
         {
             SequenceEntryIndex = SequenceEntries.Count - 1;
-            TagsAndValuesList = SequenceEntries[SequenceEntryIndex].TagsAndValuesList;
         }
     }
 }
