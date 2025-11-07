@@ -46,10 +46,15 @@ namespace WTF_DICOM.Models
         [NotifyPropertyChangedRecipients]
         private bool _selected = false;
 
-        public ObservableCollection<WTFDicomItem> TagsAndValuesList
-        {
-            get;
-        }
+
+
+        // REARCHITECT so this this is a WTFDicomDataset instead..................................
+        public WTFDicomDataset? MyDicomDataset { get; private set; }
+
+        //public ObservableCollection<WTFDicomItem> TagsAndValuesList
+        //{
+        //    get;
+        //}
 
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
         public List<DicomTag> TagColumnsToDisplay { get; set; } = new();
@@ -84,7 +89,7 @@ namespace WTF_DICOM.Models
         public DicomFileCommon(string? dicomFileName)
         {
             _dicomFileName = dicomFileName;
-            TagsAndValuesList = new ObservableCollection<WTFDicomItem>();
+            //TagsAndValuesList = new ObservableCollection<WTFDicomItem>();
 
             ReadModalityFromFile();
             ReadSOPInstanceUIDFromFile();
@@ -148,7 +153,7 @@ namespace WTF_DICOM.Models
             }
 
             WTFDicomItem wtfDicomItem = new WTFDicomItem(colTag, value);
-            if (isSequence) wtfDicomItem.DcmSequence = seq;
+            if (isSequence) wtfDicomItem.MyDicomSequence = seq;
             ItemsToDisplay.Add(wtfDicomItem);
         }
 
@@ -183,56 +188,14 @@ namespace WTF_DICOM.Models
             {
                 SeriesInstanceUID = OpenedFile.Dataset.GetString(DicomTag.SeriesInstanceUID);
             }
-        }
-
-        public List<DicomTag> DumpAllTagsToList()
-        {
-            List<DicomTag> toReturn = new List<DicomTag>();
-            foreach (var dicomItem in OpenedFile.Dataset)
-            {
-                toReturn.Add(dicomItem.Tag);
-            }
-
-            return toReturn;
-        }
+        }        
 
         public void ReadAllTags()
         {
             if (OpenedFile == null) return;
 
-            TagsAndValuesList.Clear();
-            foreach (var dicomItem in OpenedFile.Dataset)
-            {
-                DicomTag dicomTag = dicomItem.Tag;
-                string value = "";
-                bool isSequence = false;
-                DicomSequence seq = null;
-                try
-                {
-                    isSequence = Helpers.TagWrangling.IsSequence(dicomTag);
-                    if (isSequence)
-                    {
-                        seq = OpenedFile.Dataset.GetSequence(dicomTag);
-                        value = Helpers.TagWrangling.GetDisplayValueForSequence(seq, dicomTag);
-                    }
-                    else
-                    {
-                        value = OpenedFile.Dataset.GetString(dicomTag);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // value = tag.ToString();
-                    value = ex.Message;
-                }
-
-                WTFDicomItem wtfDicomItem = new WTFDicomItem(dicomTag, value);
-                if (isSequence) wtfDicomItem.DcmSequence = seq;
-                TagsAndValuesList.Add(wtfDicomItem);
-            }
-        }
-
-        
+            MyDicomDataset = new WTFDicomDataset(OpenedFile.Dataset);
+        }      
 
     }
 }

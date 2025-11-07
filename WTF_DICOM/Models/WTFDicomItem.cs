@@ -24,12 +24,6 @@ namespace WTF_DICOM.Models
         private string? _valueOfTagAsString = "";
 
         [ObservableProperty]
-        private bool _isSequence = false;
-
-        [ObservableProperty]
-        private DicomSequence? _dcmSequence = null;
-
-        [ObservableProperty]
         private bool _isReference = false;
 
         [ObservableProperty]
@@ -46,6 +40,10 @@ namespace WTF_DICOM.Models
 
         [ObservableProperty]
         private int _count = 1; 
+
+        public DicomSequence? MyDicomSequence { get; set; }
+
+        public bool IsSequence { get { return (MyDicomSequence !=null); }  }
 
         public WTFDicomItem(bool isTag, string displayString, string itemDescription)
         {

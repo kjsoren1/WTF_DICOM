@@ -44,7 +44,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     private string? _directorySelected = "dirToBe";
 
     public ObservableCollection<DicomFileCommon> DicomFiles { get; } = new();
-    public ICollectionView DicomFilesView { get; }
+    public ICollectionView DicomFilesView { get; } // used for filtering
 
     public List<DicomTag> TagColumnsToDisplay { get; private set; } = new();
 
