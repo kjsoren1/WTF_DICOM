@@ -7,15 +7,16 @@
         xmlns:models="clr-namespace:WTF_DICOM.Models"
         d:DataContext="{d:DesignInstance Type=models:WTFDicomDataset}"
         mc:Ignorable="d"
+        SizeToContent="WidthAndHeight"
         Title="TagsAndValuesWindow" Height="580" Width="800">
-  <Grid>
+  <Grid Width="800">
     <Grid.RowDefinitions>
       <!--Menu-->
-      <RowDefinition Height="auto" />
+      <RowDefinition Height="20" />
       <!--Toolbar/Searchbar-->
-      <RowDefinition Height="auto" />
+      <RowDefinition Height="*" />
       <!--Header-->
-      <RowDefinition Height="auto" />
+      <RowDefinition Height="*" />
       <!--Content-->
       <RowDefinition Height="560" />
       <!--Margin-->

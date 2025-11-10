@@ -266,7 +266,11 @@ public partial class MainWindowViewModel : ObservableRecipient
     public void SetDataGridAndColumns(System.Windows.Controls.DataGrid dataGrid)
     {
         MyDataGrid = dataGrid;
+        MyDataGrid.Height = 450;
+        MyDataGrid.Width = 800;
         MyDataGrid.Columns.Clear();
+        MyDataGrid.ColumnHeaderHeight = 40;
+        MyDataGrid.MinRowHeight = 20;
         MyDataGrid.SelectionUnit=DataGridSelectionUnit.CellOrRowHeader;
         foreach (var dcmFile in DicomFiles)
         {
@@ -295,7 +299,7 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     protected void UpdateDataGridColumns()
     {
-        if ( MyDataGrid == null ) return; 
+        if ( MyDataGrid == null ) return;         
 
         foreach (var col in DynamicColumns.Values)
         {
@@ -348,6 +352,8 @@ public partial class MainWindowViewModel : ObservableRecipient
             DynamicColumns.Add(colTag.DictionaryEntry.Name, column);
             ++idx;
         }
+
+        OnPropertyChanged(nameof(MyDataGrid));
     }
 
     private void InitializeDefaultColumnsToDisplay()

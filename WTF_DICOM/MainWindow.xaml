@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=False}"
         Style="{StaticResource MaterialDesignWindow}"
-        Title="WTF DICOM" Height="500" Width="800">
-  <Grid>
+        Title="WTF DICOM" Height="540" Width="820">
+  <Grid Width="800">
     <Grid.RowDefinitions>
       <!--Menu-->
       <RowDefinition Height="30" />
@@ -36,36 +36,13 @@
 
     <!--Toolbar-->
     <!--TODO-->
-    
+
     <!--Content-->
 
 
-    <Grid Grid.Row="2">
+    <!-- try using a  scrollviewer around the datagrid??? -->
 
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="20" />
-        <ColumnDefinition Width="auto" />
-        <ColumnDefinition Width="auto" />
-        <ColumnDefinition Width="auto" />
-        <ColumnDefinition Width="auto" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="20" />
-      </Grid.ColumnDefinitions>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="10" />
-        <RowDefinition Height="520" />
-        <RowDefinition Height="auto" />
-        <RowDefinition Height="auto" />
-        <RowDefinition Height="auto" />
-        <RowDefinition Height="auto" />
-        <RowDefinition Height="*" />
-        <RowDefinition Height="20" />
-      </Grid.RowDefinitions>
-
-
-      <!-- try using a  scrollviewer around the datagrid??? -->
-     
-      <DataGrid Grid.Column="1" Grid.Row="1"
+    <DataGrid Grid.Column="1" Grid.Row="2"
                 ItemsSource="{Binding DicomFiles}"
                 x:Name="DicomFileCommonDataGrid"
                 AutoGenerateColumns="False"
@@ -79,83 +56,31 @@
                 CanUserSortColumns="False"
                 SelectionMode="Single" SelectionUnit="CellOrRowHeader"
                 AlternationCount="2" AlternatingRowBackground="DarkViolet">
-        <!--<DataGrid.Columns>
-          <DataGridCheckBoxColumn Header="Select" />
-          <DataGridTemplateColumn Header="Filename">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <TextBlock  MaxWidth="300" Text="{Binding DicomFileName}">
-                  <TextBlock.ToolTip>
-                    <StackPanel Orientation="Vertical">
-                      <TextBlock Text="{Binding DicomFileName}" />
-                      <TextBox Text="Right-Click a cell for more options" />
-                    </StackPanel>
-                  </TextBlock.ToolTip>
-                </TextBlock>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <DataGridTextColumn Binding="{Binding SOPInstanceUID}" Header="SOPInstanceUID" />
-        </DataGrid.Columns>-->
 
-        <!--<DataGrid.ContextMenu>
-          <ContextMenu>
-            <MenuItem Header="Copy Cell To Clipboard"
-                      Command="{Binding CopyToClipboardCommand}"
-                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
-            <MenuItem Header="Show all Tags"
-                      Command="{Binding ShowAllTagsCommand}"
-                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
-            <MenuItem Header="Show in Folder"
-                      Command="{Binding ShowInFolderCommand}"
-                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
-            <MenuItem Header="Show Related Files"
-                      Command="{Binding ShowRelatedFilesCommand}"
-                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
-          </ContextMenu>
-        </DataGrid.ContextMenu>-->
-
-        <!--<DataGrid.Resources>
-          <Style TargetType="{x:Type DataGridColumnHeader}">
-            <Setter Property="ContextMenu">
-              <Setter.Value>
-                <ContextMenu>
-                  <MenuItem Header="Remove Column From Display"
-                            Command="{Binding RemoveColumnFromDisplayCommand}"
-                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}"/>
-                </ContextMenu>
-              </Setter.Value>
-            </Setter>
-          </Style>
-        </DataGrid.Resources>-->
-
-        <!--<DataGrid ContextMenuOpening="DataGridContextMenuOpeningHandler" />-->
-
-        <DataGrid.CellStyle>
-          <Style TargetType="{x:Type DataGridCell}">
-            <EventSetter Event="GotFocus" Handler="CellClick"/>
-            <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridContextMenuOpeningHandler"/>
-          </Style>
-        </DataGrid.CellStyle>
-
-        <!--<DataGrid.CellStyle>
-          <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
-            <EventSetter Event="GotFocus" Handler="CellClick"/>
-          </Style>
-        </DataGrid.CellStyle>-->
+      <DataGrid.CellStyle>
+        <Style TargetType="{x:Type DataGridCell}">
+          <EventSetter Event="GotFocus" Handler="CellClick"/>
+          <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridContextMenuOpeningHandler"/>
+          <!--<Setter Property="BorderBrush" Value="DarkViolet"/>
+          <Setter Property="BorderThickness" Value="1"/>-->
+          <Setter Property="Margin" Value="10,0,0,0"/>
+          <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+      </DataGrid.CellStyle>
 
 
-      </DataGrid>
+    </DataGrid>
 
-      <!-- **** Column 3 **** -->
-          <!-- Row 0 -->
-          <!-- Display Options Button -->
+    <!-- **** Column 3 **** -->
+    <!-- Row 0 -->
+    <!-- Display Options Button -->
 
-          <!-- Row 1+ -->
-          <!-- Basic Tags -->
-          <!-- Added Programmatically-->
+    <!-- Row 1+ -->
+    <!-- Basic Tags -->
+    <!-- Added Programmatically-->
 
-    </Grid>
 
-  </Grid> <!--end layout Grid-->
+
+  </Grid>
+  <!--end layout Grid-->
 </Window>
