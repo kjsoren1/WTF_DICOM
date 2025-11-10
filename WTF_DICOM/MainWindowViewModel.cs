@@ -78,7 +78,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     ////See: https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/generators/relaycommand
     ////and: https://learn.microsoft.com/windows/communitytoolkit/mvvm/relaycommand
 
-    /*** MAIN MENU FUNCTIONS ***/
+    #region MAIN_MENU_FUNCTIONS
 
     [RelayCommand]
     private void SelectDirectory() {
@@ -146,6 +146,10 @@ public partial class MainWindowViewModel : ObservableRecipient
         NonTagColumnsToDisplay = toLoad.NonTagColumnsToDisplay;
     }
 
+    #endregion
+
+    #region RIGHT_CLICK_FUNCTIONS
+
     [RelayCommand]
     public void CopyToClipboard(DicomFileCommon dicomFileCommon)
     {
@@ -194,6 +198,7 @@ public partial class MainWindowViewModel : ObservableRecipient
         RemoveColumnFromDisplayHelper(colTag);
     }
 
+    #endregion
 
     [RelayCommand]
     private void PlaceHolder()
@@ -201,9 +206,10 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     }
 
-    
 
-    // HELPERS
+
+    #region HELPER_FUNCTIONS
+
     private DicomFileCommon? FindSeriesWSameModalityInList(DicomFileCommon? dicomFile)
     {
         if (dicomFile == null) return null;
@@ -412,5 +418,7 @@ public partial class MainWindowViewModel : ObservableRecipient
             dcmFile.RemoveItemToDisplay(tag, idx);
         } 
     }
+
+    #endregion
 
 }

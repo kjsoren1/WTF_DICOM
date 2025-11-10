@@ -22,7 +22,7 @@
       <RowDefinition Height="1" />
     </Grid.RowDefinitions>
 
-    <StackPanel Grid.Row="2" Orientation="Horizontal" Visibility="{Binding IsSequence}">
+    <StackPanel Grid.Row="2" Orientation="Horizontal">
       <Button Command="{Binding FirstCommand}" Content="first" />
       <Button Command="{Binding Minus5Command}" Content="-5" />
       <Button Command="{Binding Minus1Command}" Content="-1" />
@@ -30,6 +30,17 @@
       <Button Command="{Binding Plus5Command}" Content="+5" />
       <Button Command="{Binding LastCommand}" Content="last" />
 
+      <StackPanel.Style>
+        <Style TargetType="{x:Type StackPanel}">
+          <Setter Property="Visibility" Value="Visible"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSequence}" Value="False">
+              <Setter Property="Visibility" Value="Collapsed"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </StackPanel.Style>
+      
     </StackPanel>
 
     <!--Content - List of tags and values-->
