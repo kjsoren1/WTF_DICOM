@@ -100,8 +100,6 @@ public partial class MainWindow
                 ContextMenu customContextMenu = new ContextMenu();
                 customContextMenu.DataContext = cell.DataContext;
 
-                // Check if it's a header?????
-
                 // COPY TO CLIPBOARD
                 MenuItem copyToClipboardItem = new MenuItem { Header = "Copy Cell To Clipboard" };
                 copyToClipboardItem.Command = _viewModel.CopyToClipboardCommand;
@@ -158,5 +156,16 @@ public partial class MainWindow
     private void OnClose(object sender, ExecutedRoutedEventArgs e)
     {
         Close();
+    }
+
+    private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        MainWindowLayoutGrid.Width = e.NewSize.Width;
+        MainWindowLayoutGrid.Height = e.NewSize.Height - 30 - 20;
+            //- MainWindowLayoutGrid.RowDefinitions[0].ActualHeight
+            //- MainWindowLayoutGrid.RowDefinitions[1].ActualHeight; // margin for menu and toolbar
+        DicomFileCommonDataGrid.Height = MainWindowLayoutGrid.Height - 50; // margin for scrollbar
+        DicomFileCommonDataGrid.Width = MainWindowLayoutGrid.Width - 30; // margin for scrollbar
+        //OnPropertyChanged(nameof(DicomFileCommonDataGrid)); // doesn't work here?
     }
 }

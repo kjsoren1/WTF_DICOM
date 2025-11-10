@@ -266,8 +266,8 @@ public partial class MainWindowViewModel : ObservableRecipient
     public void SetDataGridAndColumns(System.Windows.Controls.DataGrid dataGrid)
     {
         MyDataGrid = dataGrid;
-        MyDataGrid.Height = 450;
-        MyDataGrid.Width = 800;
+        //MyDataGrid.Height = 450;
+        //MyDataGrid.Width = 800;
         MyDataGrid.Columns.Clear();
         MyDataGrid.ColumnHeaderHeight = 40;
         MyDataGrid.MinRowHeight = 20;
@@ -386,7 +386,8 @@ public partial class MainWindowViewModel : ObservableRecipient
         };
        
         MyDataGrid.Columns.Add(column);
-        DynamicColumns.Add(tag.DictionaryEntry.Name, column);
+        DynamicColumns.Add(tag.DictionaryEntry.Name, column); // TODO - check for duplicates
+        OnPropertyChanged(nameof(MyDataGrid));
     }
 
     public void AddTagToFavorites(DicomTag tag)

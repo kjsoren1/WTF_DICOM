@@ -6,16 +6,17 @@
         xmlns:local="clr-namespace:WTF_DICOM"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=False}"
+        SizeChanged="Window_SizeChanged"
         Style="{StaticResource MaterialDesignWindow}"
         Title="WTF DICOM" Height="540" Width="820">
-  <Grid Width="800">
+  <Grid Width="800" x:Name="MainWindowLayoutGrid">
     <Grid.RowDefinitions>
       <!--Menu-->
       <RowDefinition Height="30" />
       <!--Toolbar-->
       <RowDefinition Height="20" />
       <!--Content-->
-      <RowDefinition Height="450" />
+      <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
     <!--Menu-->
@@ -42,7 +43,7 @@
 
     <!-- try using a  scrollviewer around the datagrid??? -->
 
-    <DataGrid Grid.Column="1" Grid.Row="2"
+    <DataGrid Grid.Column="0" Grid.Row="2"
                 ItemsSource="{Binding DicomFiles}"
                 x:Name="DicomFileCommonDataGrid"
                 AutoGenerateColumns="False"
@@ -68,19 +69,9 @@
         </Style>
       </DataGrid.CellStyle>
 
-
     </DataGrid>
-
-    <!-- **** Column 3 **** -->
-    <!-- Row 0 -->
-    <!-- Display Options Button -->
-
-    <!-- Row 1+ -->
-    <!-- Basic Tags -->
-    <!-- Added Programmatically-->
-
-
 
   </Grid>
   <!--end layout Grid-->
+  
 </Window>
