@@ -16,14 +16,14 @@ namespace WTF_DICOM;
 /// </summary>
 public partial class MainWindow
 {
-    private readonly MainWindowViewModel _viewModel;    
+    private readonly MainWindowViewModel _viewModel;
 
     public MainWindow(MainWindowViewModel viewModel)
     {
         InitializeComponent();
 
         DataContext = _viewModel = viewModel;
-        viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);       
+        viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);
 
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
     }
@@ -37,6 +37,15 @@ public partial class MainWindow
         }
     }
 
+    public void HeaderClick(object sender, RoutedEventArgs e)
+    {
+        if (sender != null)
+        {
+            DataGridColumnHeader? header = sender as DataGridColumnHeader;
+            if (header != null) _viewModel.LastSelectedCellColumnIndex = header.DisplayIndex;
+        }
+    }
+
     private bool IsHeader(ContextMenuEventArgs e)
     {
         DependencyObject dep = (DependencyObject)e.OriginalSource;
@@ -46,6 +55,7 @@ public partial class MainWindow
         }
         return (dep != null && dep is DataGridColumnHeader);
     }
+
     public void DataGridContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)
     {
         DependencyObject dep = (DependencyObject)e.OriginalSource;
@@ -153,6 +163,49 @@ public partial class MainWindow
         }
     }
 
+    public void DataGridHeaderContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)
+    {
+        DependencyObject dep = (DependencyObject)e.OriginalSource;
+        while ((dep != null) && !(dep is DataGridCell) && !(dep is DataGridColumnHeader))
+        {
+            dep = VisualTreeHelper.GetParent(dep);
+        }
+        if (dep == null) return;
+        if (dep is DataGridColumnHeader)
+        {
+            DataGridColumnHeader colHeader = dep as DataGridColumnHeader;
+            if (colHeader == null) { return; }
+            int idx = colHeader.Column.DisplayIndex;
+            // Get the element that raised the event
+            FrameworkElement fe = e.Source as FrameworkElement;
+            if (fe != null)
+            {
+                // Example: Create a new ContextMenu dynamically
+                ContextMenu customContextMenu = new ContextMenu();
+                customContextMenu.DataContext = colHeader.DataContext;
+
+                if (idx >= _viewModel.NonTagColumnsToDisplay.Count)
+                {
+                    // REMOVE COLUMN FROM DISPLAY
+                    MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
+                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayByIndexCommand;
+                    removeColumnFromDisplayItem.CommandParameter = idx;
+                    customContextMenu.Items.Add(removeColumnFromDisplayItem);
+                }
+
+                // Assign the new ContextMenu to the element
+                fe.ContextMenu = customContextMenu;
+                fe.ContextMenu.IsOpen = true;
+
+                // Optional: Mark the event as handled to prevent the default ContextMenu from opening
+                // This is particularly important if you want to completely replace a pre-existing ContextMenu.
+                // If the element initially has no ContextMenu, marking it handled might not be necessary,
+                // but it's good practice for consistency.
+                e.Handled = true;
+            }
+        }
+    }
+
     private void OnClose(object sender, ExecutedRoutedEventArgs e)
     {
         Close();
@@ -162,8 +215,8 @@ public partial class MainWindow
     {
         MainWindowLayoutGrid.Width = e.NewSize.Width;
         MainWindowLayoutGrid.Height = e.NewSize.Height - 30 - 20;
-            //- MainWindowLayoutGrid.RowDefinitions[0].ActualHeight
-            //- MainWindowLayoutGrid.RowDefinitions[1].ActualHeight; // margin for menu and toolbar
+        //- MainWindowLayoutGrid.RowDefinitions[0].ActualHeight
+        //- MainWindowLayoutGrid.RowDefinitions[1].ActualHeight; // margin for menu and toolbar
         DicomFileCommonDataGrid.Height = MainWindowLayoutGrid.Height - 50; // margin for scrollbar
         DicomFileCommonDataGrid.Width = MainWindowLayoutGrid.Width - 30; // margin for scrollbar
         //OnPropertyChanged(nameof(DicomFileCommonDataGrid)); // doesn't work here?

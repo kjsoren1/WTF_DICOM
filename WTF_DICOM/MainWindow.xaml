@@ -59,7 +59,8 @@
                 AlternationCount="2" AlternatingRowBackground="DarkViolet">
 
       <DataGrid.CellStyle>
-        <Style TargetType="{x:Type DataGridCell}">
+        <Style TargetType="{x:Type DataGridCell}"
+               BasedOn="{StaticResource {x:Type DataGridCell}}">
           <EventSetter Event="GotFocus" Handler="CellClick"/>
           <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridContextMenuOpeningHandler"/>
           <!--<Setter Property="BorderBrush" Value="DarkViolet"/>
@@ -68,6 +69,19 @@
           <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
       </DataGrid.CellStyle>
+
+      <DataGrid.ColumnHeaderStyle>
+        <Style TargetType="{x:Type DataGridColumnHeader}"
+               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+          <EventSetter Event="GotFocus" Handler="HeaderClick"/>
+          <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridContextMenuOpeningHandler"/>
+          <Setter Property="Margin" Value="0,1,0,0"/>
+          <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+      </DataGrid.ColumnHeaderStyle>
+      
+      
+      
 
     </DataGrid>
 
