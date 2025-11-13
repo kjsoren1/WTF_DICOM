@@ -41,9 +41,26 @@ namespace WTF_DICOM.Models
         [ObservableProperty]
         private int _count = 1; 
 
-        public DicomSequence? MyDicomSequence { get; set; }
+        private DicomSequence? _myDicomSequence;
+        public DicomSequence? MyDicomSequence
+        { 
+            get { return _myDicomSequence; }
+            set
+            {
+                _myDicomSequence = value;
+                if (value != null)
+                {
+                    IsSequence = true;
+                    if (Helpers.TagWrangling.ContainsReferencedSOPInstanceUID(this))
+                    {
+                        IsReferencedSequence = true;
+                    }
+                }
+            }
+        }
 
-        public bool IsSequence { get { return (MyDicomSequence !=null); }  }
+        public bool IsSequence { get; private set; }
+        public bool IsReferencedSequence { get; private set; }
 
         public WTFDicomItem(bool isTag, string displayString, string itemDescription)
         {

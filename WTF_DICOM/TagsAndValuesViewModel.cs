@@ -118,6 +118,46 @@ namespace WTF_DICOM
         public void ShowReferencedFiles(WTFDicomItem tag)
         {
             if (tag == null) return;
+
+
+            // TODO - make a window
+
+
+
+            List<DicomItem> referenceDicomItems = Helpers.TagWrangling.GetAllReferencedSOPInstanceUID(tag);
+            ObservableCollection<ReferencedSOPInstanceUIDInfo> referencedFiles = new ObservableCollection<ReferencedSOPInstanceUIDInfo>();
+            foreach(DicomItem item in referenceDicomItems)
+            {
+                string referencedSOPInstanceUID = "";
+                if (item is DicomElement element)
+                {
+                    referencedSOPInstanceUID = element.Get<string>();
+                }
+
+                bool found = false;
+                // try to find file in our list of known files
+                foreach(DicomFileCommon dicomFileCommon in _mainWindowViewModel.DicomFiles)
+                {                    
+                    if (referencedSOPInstanceUID.Equals(dicomFileCommon.SOPInstanceUID))
+                    {
+                        ReferencedSOPInstanceUIDInfo referencedFile =
+                            new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, dicomFileCommon.DicomFileName, dicomFileCommon.Modality);
+                        referencedFiles.Add(referencedFile);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    ReferencedSOPInstanceUIDInfo referencedFile =
+                        new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, "no file found", "unknown");
+                    referencedFiles.Add(referencedFile);
+                }
+            }
+
+            ReferencedSOPInstanceUIDViewModel referencedSOPInstanceUIDViewModel = new ReferencedSOPInstanceUIDViewModel(referencedFiles);
+            ReferencedSOPInstanceUIDsWindow window = new ReferencedSOPInstanceUIDsWindow(referencedSOPInstanceUIDViewModel);
+            window.Show();
         }
 
         [RelayCommand]

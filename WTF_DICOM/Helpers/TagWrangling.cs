@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FellowOakDicom;
 
-using FellowOakDicom;
+using WTF_DICOM.Models;
 
 namespace WTF_DICOM.Helpers
 {
@@ -64,6 +60,84 @@ namespace WTF_DICOM.Helpers
             return tagInWords.Contains("Referenced"); // hack for now
         }
 
+        public static bool ContainsReferencedSOPInstanceUID(WTFDicomItem dicomItem)
+        {
+            if (dicomItem == null) return false;
+            if (dicomItem.Tag.Equals(DicomTag.ReferencedSOPInstanceUID)) return true;
+            if (!dicomItem.IsSequence) return false;
+
+            foreach (DicomDataset dicomDataset in dicomItem.MyDicomSequence)
+            {
+                return ContainsReferencedSOPInstanceUID(dicomDataset);
+            }
+
+            return false;
+        }
+
+        public static bool ContainsReferencedSOPInstanceUID(DicomDataset dicomDataset)
+        {
+            if (dicomDataset == null) return false;
+
+            foreach (var dicomItem in dicomDataset)
+            {
+                DicomTag dicomTag = dicomItem.Tag;
+                if (dicomTag.Equals(DicomTag.ReferencedSOPInstanceUID))
+                {
+                    return true;
+                }
+                else if (IsSequence(dicomItem.Tag))
+                {
+                    DicomSequence seq = dicomDataset.GetSequence(dicomTag);
+                    foreach (DicomDataset dataset in seq)
+                    {
+                        if (ContainsReferencedSOPInstanceUID(dataset))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static List<DicomItem> GetAllReferencedSOPInstanceUID(WTFDicomItem dicomItem)
+        {
+            List<DicomItem> references = new List<DicomItem>();
+            foreach (DicomDataset dicomDataset in dicomItem.MyDicomSequence)
+            {
+                GetAllReferencedSOPInstanceUID(dicomDataset, references);
+            }
+            return references;
+        }
+
+        public static void GetAllReferencedSOPInstanceUID(DicomDataset dicomDataset, List<DicomItem> referencedSOPInstanceUIDItems)
+        {
+            if (dicomDataset == null) return;
+            if (referencedSOPInstanceUIDItems == null)
+            {
+                referencedSOPInstanceUIDItems = new List<DicomItem>();
+            }
+
+            foreach (var dicomItem in dicomDataset)
+            {
+                DicomTag dicomTag = dicomItem.Tag;
+                if (dicomTag.Equals(DicomTag.ReferencedSOPInstanceUID))
+                {
+                    referencedSOPInstanceUIDItems.Add(dicomItem);
+                }
+                else if (IsSequence(dicomItem.Tag))
+                {
+                    DicomSequence seq = dicomDataset.GetSequence(dicomTag);
+                    foreach (DicomDataset innerDataset in seq)
+                    {
+                        GetAllReferencedSOPInstanceUID(innerDataset, referencedSOPInstanceUIDItems);
+                    }
+                }
+            }
+        }
+
+
         public static string SequenceRepresentativeString(DicomSequence seq, DicomTag dicomTag)
         {
             string toReturn = "{";
@@ -78,7 +152,8 @@ namespace WTF_DICOM.Helpers
                     {
                         toReturn += ", ";
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                 }
             }

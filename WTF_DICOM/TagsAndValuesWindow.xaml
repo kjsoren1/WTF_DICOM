@@ -60,7 +60,7 @@
         <DataGridTextColumn Binding="{Binding ValueOfTagAsString}" Header="Value" />
       </DataGrid.Columns>
 
-      <DataGrid.ContextMenu>
+      <!--<DataGrid.ContextMenu>
         <ContextMenu>
           <MenuItem Header="Copy Cell To Clipboard"
                     Command="{Binding CopyToClipboardCommand}"
@@ -70,16 +70,30 @@
                     CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
           <MenuItem Header="Show Sequence"
                     Command="{Binding ShowSequenceCommand}"
-                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
+                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}">
+            --><!--<MenuItem.Style>
+              <Style TargetType="{x:Type MenuItem}">
+                <Setter Property="Visibility" Value="Visible"/>
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding IsSequence}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </MenuItem.Style>--><!--
+          </MenuItem>
           <MenuItem Header="Add Tag to Display"
                     Command="{Binding AddTagToDisplayCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}" />
         </ContextMenu>
-      </DataGrid.ContextMenu>
+      </DataGrid.ContextMenu>-->
 
       <DataGrid.CellStyle>
         <Style TargetType="{x:Type DataGridCell}">
           <EventSetter Event="GotFocus" Handler="CellClick"/>
+          <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridContextMenuOpeningHandler"/>
+          <Setter Property="Margin" Value="10,0,0,0"/>
+          <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
       </DataGrid.CellStyle>
 

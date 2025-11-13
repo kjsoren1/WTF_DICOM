@@ -15,38 +15,28 @@ using System.Windows.Shapes;
 
 using WTF_DICOM.Models;
 
-namespace WTF_DICOM
+namespace WTF_DICOM;
+
+/// <summary>
+/// Interaction logic for SimpleDicomFilesViewModel.xaml
+/// </summary>
+public partial class SimpleDicomFilesWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for SimpleDicomFilesViewModel.xaml
-    /// </summary>
-    public partial class SimpleDicomFilesWindow : Window
+    private readonly SimpleDicomFilesViewModel _viewModel;
+    
+    public SimpleDicomFilesWindow(SimpleDicomFilesViewModel viewModel)
     {
-        private readonly SimpleDicomFilesViewModel _viewModel;
-        
-        public SimpleDicomFilesWindow(SimpleDicomFilesViewModel viewModel)
-        {
-            InitializeComponent();
+        InitializeComponent();
 
-            DataContext = _viewModel = viewModel;
-            viewModel.MyDataGrid = SimpleDicomFilesDataGrid;
+        DataContext = _viewModel = viewModel;
+        viewModel.MyDataGrid = SimpleDicomFilesDataGrid;
 
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
-        }
+        CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
+    }
 
-        public void CellClick(object sender, RoutedEventArgs e)
-        {
-            if (sender != null)
-            {
-                DataGridCell? cell = sender as DataGridCell;
-                if (cell != null) _viewModel.LastSelectedCellColumnIndex = cell.Column.DisplayIndex;
-            }
-        }
-
-        private void OnClose(object sender, ExecutedRoutedEventArgs e)
-        {
-            Close();
-        }
+    private void OnClose(object sender, ExecutedRoutedEventArgs e)
+    {
+        Close();
     }
 }
 

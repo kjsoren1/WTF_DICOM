@@ -79,9 +79,7 @@
           <Setter Property="BorderThickness" Value="1"/>
         </Style>
       </DataGrid.ColumnHeaderStyle>
-      
-      
-      
+
 
     </DataGrid>
 

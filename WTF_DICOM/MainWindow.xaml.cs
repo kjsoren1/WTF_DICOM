@@ -64,40 +64,7 @@ public partial class MainWindow
             dep = VisualTreeHelper.GetParent(dep);
         }
         if (dep == null) return;
-        if (dep is DataGridColumnHeader)
-        {
-            DataGridColumnHeader colHeader = dep as DataGridColumnHeader;
-            if (colHeader == null) { return; }
-            int idx = colHeader.Column.DisplayIndex;
-            // Get the element that raised the event
-            FrameworkElement fe = e.Source as FrameworkElement;
-            if (fe != null)
-            {
-                // Example: Create a new ContextMenu dynamically
-                ContextMenu customContextMenu = new ContextMenu();
-                customContextMenu.DataContext = colHeader.DataContext;
-
-                if (idx >= _viewModel.NonTagColumnsToDisplay.Count)
-                {
-                    // REMOVE COLUMN FROM DISPLAY
-                    MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
-                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayByIndexCommand;
-                    removeColumnFromDisplayItem.CommandParameter = idx;
-                    customContextMenu.Items.Add(removeColumnFromDisplayItem);
-                }
-
-                // Assign the new ContextMenu to the element
-                fe.ContextMenu = customContextMenu;
-                fe.ContextMenu.IsOpen = true;
-
-                // Optional: Mark the event as handled to prevent the default ContextMenu from opening
-                // This is particularly important if you want to completely replace a pre-existing ContextMenu.
-                // If the element initially has no ContextMenu, marking it handled might not be necessary,
-                // but it's good practice for consistency.
-                e.Handled = true;
-            }
-        }
-        else if (dep is DataGridCell)
+        if (dep is DataGridCell)
         {
             DataGridCell cell = dep as DataGridCell;
             if (cell == null) { return; }
@@ -134,25 +101,9 @@ public partial class MainWindow
                 showRelatedFilesItem.CommandParameter = cell.DataContext;
                 customContextMenu.Items.Add(showRelatedFilesItem);
 
-                //// REMOVE COLUMN FROM DISPLAY
-                //MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
-                //removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayCommand;
-                //removeColumnFromDisplayItem.CommandParameter = cell.DataContext;
-                //customContextMenu.Items.Add(removeColumnFromDisplayItem);
-
-                if (idx >= _viewModel.NonTagColumnsToDisplay.Count)
-                {
-                    // REMOVE COLUMN FROM DISPLAY
-                    MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
-                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayByIndexCommand;
-                    removeColumnFromDisplayItem.CommandParameter = idx;
-                    customContextMenu.Items.Add(removeColumnFromDisplayItem);
-                }
-
                 // Assign the new ContextMenu to the element
                 fe.ContextMenu = customContextMenu;
                 fe.ContextMenu.IsOpen = true;
-
 
                 // Optional: Mark the event as handled to prevent the default ContextMenu from opening
                 // This is particularly important if you want to completely replace a pre-existing ContextMenu.
