@@ -46,10 +46,13 @@ namespace WTF_DICOM.Helpers
             return isVR;
         }
 
+        // NOTE: C:\Users\Kelly\source\repos\DicomTestFiles\SlicerRtData\eclipse-11-lung-contours-on-same-slices 
+        // contains private tags with all ValueRepresentations so this check is not a guarantee
         public static bool IsSequence(DicomTag dicomTag)
         {
             return Helpers.TagWrangling.valueRepresentationContains(dicomTag, FellowOakDicom.DicomVR.SQ);
         }
+
         public static bool IsReferencedSequence(DicomTag dicomTag)
         {
             if (dicomTag == null) return false;
@@ -85,15 +88,25 @@ namespace WTF_DICOM.Helpers
                 {
                     return true;
                 }
-                else if (IsSequence(dicomItem.Tag))
+                else if (IsSequence(dicomTag))
                 {
-                    DicomSequence seq = dicomDataset.GetSequence(dicomTag);
-                    foreach (DicomDataset dataset in seq)
+                    try
                     {
-                        if (ContainsReferencedSOPInstanceUID(dataset))
+                        DicomSequence seq = dicomDataset.GetSequence(dicomTag);
+                        foreach (DicomDataset dataset in seq)
                         {
-                            return true;
+                            if (ContainsReferencedSOPInstanceUID(dataset))
+                            {
+                                return true;
+                            }
                         }
+                    }
+                    catch
+                    {
+                        // NOTE: C:\Users\Kelly\source\repos\DicomTestFiles\SlicerRtData\eclipse-11-lung-contours-on-same-slices 
+                        // contains private tags with all ValueRepresentations so the IsSequence() check is not a guarantee
+                        // this try-catch guards against the case where it was not actually a sequence
+                        return false;
                     }
                 }
             }

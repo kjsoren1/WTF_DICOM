@@ -119,11 +119,6 @@ namespace WTF_DICOM
         {
             if (tag == null) return;
 
-
-            // TODO - make a window
-
-
-
             List<DicomItem> referenceDicomItems = Helpers.TagWrangling.GetAllReferencedSOPInstanceUID(tag);
             ObservableCollection<ReferencedSOPInstanceUIDInfo> referencedFiles = new ObservableCollection<ReferencedSOPInstanceUIDInfo>();
             foreach(DicomItem item in referenceDicomItems)
@@ -145,6 +140,17 @@ namespace WTF_DICOM
                         referencedFiles.Add(referencedFile);
                         found = true;
                         break;
+                    }
+                    foreach (DicomFileCommon relatedFile in dicomFileCommon.ReferencedOrRelatedDicomFiles)
+                    {
+                        if (referencedSOPInstanceUID.Equals(relatedFile.SOPInstanceUID))
+                        {
+                            ReferencedSOPInstanceUIDInfo referencedFile =
+                                new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, relatedFile.DicomFileName, relatedFile.Modality);
+                            referencedFiles.Add(referencedFile);
+                            found = true;
+                            break;
+                        }
                     }
                 }
                 if (!found)
