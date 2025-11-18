@@ -15,14 +15,16 @@ namespace WTF_DICOM
     public partial class SimpleDicomFilesViewModel : ObservableRecipient
     {
         public ObservableCollection<DicomFileCommon> ReferencedOrRelatedDicomFiles { get; } = new();
+        public DicomFileCommon RepresentativeFile { get; set; }
         
         public int LastSelectedCellColumnIndex { get; set; } = 0; // set in TagsAndValuesViewWindow CellClick()
 
         public DataGrid? MyDataGrid { get; set; }
 
-        public SimpleDicomFilesViewModel(ObservableCollection<DicomFileCommon> relatedFiles)
+        public SimpleDicomFilesViewModel(DicomFileCommon representativeFile)
         {
-            ReferencedOrRelatedDicomFiles = relatedFiles;
+            ReferencedOrRelatedDicomFiles = representativeFile.ReferencedOrRelatedDicomFiles;
+            RepresentativeFile = representativeFile;
         }        
     }
 }

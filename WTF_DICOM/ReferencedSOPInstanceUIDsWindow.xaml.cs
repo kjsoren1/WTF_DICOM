@@ -26,6 +26,8 @@ public partial class ReferencedSOPInstanceUIDsWindow : Window
 
         DataContext = _viewModel = viewModel;
         viewModel.MyDataGrid = ReferencedSOPInstanceUIDsDataGrid;
+
+        this.Title = viewModel.TagOfOrigin.TagInWords;
     }
 
     public void DataGridContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)

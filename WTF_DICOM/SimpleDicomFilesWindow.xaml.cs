@@ -31,7 +31,9 @@ public partial class SimpleDicomFilesWindow : Window
         DataContext = _viewModel = viewModel;
         viewModel.MyDataGrid = SimpleDicomFilesDataGrid;
 
-        CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
+        this.Title = viewModel.RepresentativeFile.DicomFileName;
+
+        //CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
     }
 
     private void OnClose(object sender, ExecutedRoutedEventArgs e)

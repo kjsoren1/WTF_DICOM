@@ -27,6 +27,11 @@
       <Button Command="{Binding FirstCommand}" Content="first" />
       <Button Command="{Binding Minus5Command}" Content="-5" />
       <Button Command="{Binding Minus1Command}" Content="-1" />
+      <TextBlock Text="{Binding SequenceCounterString}" VerticalAlignment="Center" Margin="4,0,4,0">
+        <!--<TextBlock.DataContext>
+          <local:TagsAndValuesViewModel/>
+        </TextBlock.DataContext>-->
+      </TextBlock>
       <Button Command="{Binding Plus1Command}" Content="+1" />
       <Button Command="{Binding Plus5Command}" Content="+5" />
       <Button Command="{Binding LastCommand}" Content="last" />

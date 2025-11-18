@@ -6,7 +6,7 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <materialDesign:BundledTheme BaseTheme="Inherit" 
+        <materialDesign:BundledTheme BaseTheme="Dark" 
                                      PrimaryColor="Purple" 
                                      SecondaryColor="LightGreen" />
 

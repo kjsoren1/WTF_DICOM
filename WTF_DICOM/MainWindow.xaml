@@ -74,7 +74,7 @@
         <Style TargetType="{x:Type DataGridColumnHeader}"
                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
           <EventSetter Event="GotFocus" Handler="HeaderClick"/>
-          <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridContextMenuOpeningHandler"/>
+          <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridHeaderContextMenuOpeningHandler"/>
           <Setter Property="Margin" Value="0,1,0,0"/>
           <Setter Property="BorderThickness" Value="1"/>
         </Style>

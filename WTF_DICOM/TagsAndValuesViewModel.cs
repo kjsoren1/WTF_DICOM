@@ -38,10 +38,15 @@ namespace WTF_DICOM
                 value = Math.Max(0, value);
                 value = Math.Min(value, SequenceEntries.Count-1);
                 _sequenceEntryIndex = value;
+                SequenceCounterString = "(" + (SequenceEntryIndex+1) + " of " + SequenceEntries.Count + ")";
                 TagsAndValuesList = SequenceEntries[_sequenceEntryIndex].TagsAndValuesList;
+                OnPropertyChanged(nameof(SequenceCounterString));
                 OnPropertyChanged(nameof(TagsAndValuesList));
             }
         }
+
+        [ObservableProperty]
+        public string _sequenceCounterString = "";
 
         [ObservableProperty]
         public bool _isSequence = false;
@@ -49,12 +54,15 @@ namespace WTF_DICOM
         public int LastSelectedCellColumnIndex { get; set; } = 0; // set in TagsAndValuesViewWindow CellClick()
         public DataGrid? MyDataGrid { get; set; }
 
+        public string TitleToDisplay { get; set; } = "Title";
+
         public TagsAndValuesViewModel(MainWindowViewModel mwvm, DicomFileCommon dicomFile)
         {
             _myDicomFileCommon = dicomFile;
             _dicomFileName = dicomFile.DicomFileName;
             _mainWindowViewModel = mwvm;
             TagsAndValuesList = dicomFile.MyDicomDataset.TagsAndValuesList;
+            TitleToDisplay = _dicomFileName;
         }
 
         // use this constructor when displaying the contents of a sequence
@@ -65,8 +73,10 @@ namespace WTF_DICOM
             _myParentSequence = seq;
             _mainWindowViewModel = mwvm;
             SequenceEntries = sequenceEntries;
+            SequenceEntryIndex = 0;
             TagsAndValuesList = SequenceEntries[0].TagsAndValuesList;
             IsSequence = true;
+            TitleToDisplay = seq.Tag.DictionaryEntry.Name;
         }
 
         [RelayCommand]
@@ -161,7 +171,7 @@ namespace WTF_DICOM
                 }
             }
 
-            ReferencedSOPInstanceUIDViewModel referencedSOPInstanceUIDViewModel = new ReferencedSOPInstanceUIDViewModel(referencedFiles);
+            ReferencedSOPInstanceUIDViewModel referencedSOPInstanceUIDViewModel = new ReferencedSOPInstanceUIDViewModel(referencedFiles, tag);
             ReferencedSOPInstanceUIDsWindow window = new ReferencedSOPInstanceUIDsWindow(referencedSOPInstanceUIDViewModel);
             window.Show();
         }

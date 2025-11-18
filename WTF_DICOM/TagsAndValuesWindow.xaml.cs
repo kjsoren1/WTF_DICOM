@@ -41,7 +41,9 @@ namespace WTF_DICOM
                 // enable forward/backward navigation buttons
             }
 
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
+            this.Title = viewModel.TitleToDisplay;
+
+            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
         }
 
 

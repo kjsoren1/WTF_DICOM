@@ -17,11 +17,14 @@ public partial class ReferencedSOPInstanceUIDViewModel : ObservableRecipient
 {
     public ObservableCollection<ReferencedSOPInstanceUIDInfo> ReferencedSOPInstanceUIDs { get; } = new();
 
+    public WTFDicomItem TagOfOrigin { get; set; }
+
     public DataGrid? MyDataGrid { get; set; }
 
-    public ReferencedSOPInstanceUIDViewModel(ObservableCollection<ReferencedSOPInstanceUIDInfo> referencedSOPInstanceUIDInfos)
+    public ReferencedSOPInstanceUIDViewModel(ObservableCollection<ReferencedSOPInstanceUIDInfo> referencedSOPInstanceUIDInfos, WTFDicomItem tag)
     {
         ReferencedSOPInstanceUIDs = referencedSOPInstanceUIDInfos;
+        TagOfOrigin = tag;
     }
 
     [RelayCommand]

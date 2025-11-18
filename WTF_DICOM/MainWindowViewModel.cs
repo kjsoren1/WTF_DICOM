@@ -169,7 +169,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     [RelayCommand]
     public static void ShowRelatedFiles(DicomFileCommon dicomFileCommon)
     {
-        SimpleDicomFilesViewModel simpleViewModel = new SimpleDicomFilesViewModel(dicomFileCommon.ReferencedOrRelatedDicomFiles);
+        SimpleDicomFilesViewModel simpleViewModel = new SimpleDicomFilesViewModel(dicomFileCommon);
         SimpleDicomFilesWindow simpleDicomFilesWindow = new SimpleDicomFilesWindow(simpleViewModel);
         simpleDicomFilesWindow.Show();
     }
