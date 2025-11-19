@@ -165,10 +165,6 @@ namespace WTF_DICOM.Models
             {
                 ItemsToDisplay.RemoveAt(idx);
             }
-            else
-            {
-                int x = 1;
-            }
             OnPropertyChanged(nameof(ItemsToDisplay));
         }
 
