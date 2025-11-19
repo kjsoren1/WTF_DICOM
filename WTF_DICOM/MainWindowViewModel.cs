@@ -388,6 +388,7 @@ public partial class MainWindowViewModel : ObservableRecipient
         MyDataGrid.Columns.Add(column);
         DynamicColumns.Add(tag.DictionaryEntry.Name, column); // TODO - check for duplicates
         OnPropertyChanged(nameof(MyDataGrid));
+        //OnPropertyChanged(nameof(DynamicColumns));
     }
 
     public void AddTagToFavorites(DicomTag tag)
@@ -415,15 +416,16 @@ public partial class MainWindowViewModel : ObservableRecipient
         {
             return; // can't currently remove the non-tag columns
         }
-        var colToRemove = DynamicColumns.GetValueOrDefault(tag.DictionaryEntry.Name);
-        MyDataGrid.Columns.Remove(colToRemove);
-        TagColumnsToDisplay.Remove(tag);
-        DynamicColumns.Remove(tag.DictionaryEntry.Name);
 
+        // Remove from each DicomFileCommon object, then rebuild the grid
         foreach (var dcmFile in DicomFiles)
         {
             dcmFile.RemoveItemToDisplay(tag, idx);
-        } 
+        }
+        
+        MyDataGrid.Columns.Clear();
+        //MyDataGrid.ItemsSource = DicomFiles; // because bindings are finicky
+        UpdateDataGridColumns();
     }
 
     #endregion

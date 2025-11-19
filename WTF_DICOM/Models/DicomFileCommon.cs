@@ -155,6 +155,7 @@ namespace WTF_DICOM.Models
             WTFDicomItem wtfDicomItem = new WTFDicomItem(colTag, value);
             if (isSequence) wtfDicomItem.MyDicomSequence = seq;
             ItemsToDisplay.Add(wtfDicomItem);
+            OnPropertyChanged(nameof(ItemsToDisplay));
         }
 
         public void RemoveItemToDisplay(DicomTag colTag, int idx)
@@ -164,6 +165,11 @@ namespace WTF_DICOM.Models
             {
                 ItemsToDisplay.RemoveAt(idx);
             }
+            else
+            {
+                int x = 1;
+            }
+            OnPropertyChanged(nameof(ItemsToDisplay));
         }
 
         private void ReadModalityFromFile()

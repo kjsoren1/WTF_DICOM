@@ -94,7 +94,17 @@ namespace WTF_DICOM
                     copyToClipboardItem.CommandParameter = cell.DataContext;
                     customContextMenu.Items.Add(copyToClipboardItem);
 
+                    // ADD TAG TO DISPLAY
+                    MenuItem addTagToDisplayItem = new MenuItem { Header = "Add Tag to Main Display" };
+                    addTagToDisplayItem.Command = _viewModel.AddTagToDisplayCommand;
+                    addTagToDisplayItem.CommandParameter = cell.DataContext;
+                    customContextMenu.Items.Add(addTagToDisplayItem);
 
+                    // ADD TAG TO FAVORITES
+                    MenuItem addTagToFavoritesItem = new MenuItem { Header = "Add Tag to Favorites" };
+                    addTagToFavoritesItem.Command = _viewModel.AddTagToFavoritesCommand;
+                    addTagToFavoritesItem.CommandParameter = cell.DataContext;
+                    customContextMenu.Items.Add(addTagToFavoritesItem);
 
                     if (isSequence)
                     {
