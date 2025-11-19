@@ -75,6 +75,14 @@ namespace WTF_DICOM.Models
             _displayString = count.ToString();
             _itemDescription = itemDescription;
         }
+        public WTFDicomItem(bool isTag, bool selected, string itemDescription)
+        {
+            _isTag = isTag;
+            _isSelected = selected;
+            _displayString = selected.ToString();
+            _itemDescription = itemDescription;
+        }
+
 
         public WTFDicomItem(DicomTag? dicomTag, string? valueOfTagAsString)
         {

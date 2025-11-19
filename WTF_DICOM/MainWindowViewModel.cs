@@ -127,6 +127,27 @@ public partial class MainWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
+    private void ShowAllSelectedInFolder()
+    {
+        List<string> filesToShow = new List<string>();
+        foreach(DicomFileCommon dfc in DicomFiles)
+        {
+            if (dfc.Selected)
+            {
+                filesToShow.Add($"{dfc.DicomFileName}");
+                if (dfc.NumberRelatedFiles > 0)
+                {
+                    foreach (DicomFileCommon rdfc in dfc.ReferencedOrRelatedDicomFiles)
+                    {
+                        filesToShow.Add($"{rdfc.DicomFileName}");
+                    }
+                }
+            }
+        }
+        Helpers.ShowSelectedInExplorer.FilesOrFolders(filesToShow.ToArray());
+    }
+
+    [RelayCommand]
     private void SaveDisplayAsTemplate()
     {
         DisplayTemplate toSave = new DisplayTemplate();
@@ -318,10 +339,15 @@ public partial class MainWindowViewModel : ObservableRecipient
                 string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.SELECT, "Select");
                 var column = new DataGridCheckBoxColumn() {
                     Header = new TextBlock() { Text = headerString },
-                    Binding = new Binding($"ItemsToDisplay[{idx}].IsSelected"),
+                    //Binding = new Binding($"ItemsToDisplay[0].IsSelected"),
                     IsReadOnly = false
                 };
-
+               
+                Binding cbBinding = new Binding($"Selected");
+                cbBinding.Mode = BindingMode.TwoWay;
+                //cbBinding.Path = new PropertyPath("IsSelected");
+                cbBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+                column.Binding = cbBinding;
                 MyDataGrid.Columns.Add(column);
                 DynamicColumns.Add(headerString, column);
                 ++idx;
@@ -332,7 +358,7 @@ public partial class MainWindowViewModel : ObservableRecipient
                 string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.COUNT, "Count");
                 var column = new DataGridTextColumn() {
                     Header = new TextBlock() { Text = headerString },
-                    Binding = new Binding($"ItemsToDisplay[{idx}].Count")
+                    Binding = new Binding($"ItemsToDisplay[1].Count")
                 };
 
                 MyDataGrid.Columns.Add(column);
@@ -424,7 +450,6 @@ public partial class MainWindowViewModel : ObservableRecipient
         }
         
         MyDataGrid.Columns.Clear();
-        //MyDataGrid.ItemsSource = DicomFiles; // because bindings are finicky
         UpdateDataGridColumns();
     }
 

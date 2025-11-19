@@ -25,6 +25,7 @@
       <MenuItem Header="_File" MinWidth="100">
         <MenuItem Header="Select Directory" Command="{Binding SelectDirectoryCommand}" />
         <MenuItem Header="Select File" Command="{Binding SelectFileCommand}" />
+        <MenuItem Header="Show All Selected In Folder" Command="{Binding ShowAllSelectedInFolderCommand}" />
       </MenuItem>
       <Separator/>
       <MenuItem Header="_Options" MinWidth="100">
@@ -33,6 +34,13 @@
       </MenuItem>
       <Separator/>
       <MenuItem Header="E_xit" Command="{x:Static ApplicationCommands.Close}"/>
+
+      <!--<Menu.Style>
+        <Style TargetType="{x:Type MenuItem}"
+               BasedOn="{StaticResource {x:Type MenuItem}}">
+          <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
+      </Menu.Style>-->
     </Menu>
 
     <!--Toolbar-->

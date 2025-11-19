@@ -42,19 +42,26 @@ namespace WTF_DICOM.Models
             }
         }
 
-        [ObservableProperty]
-        [NotifyPropertyChangedRecipients]
+        //[ObservableProperty]
+        //[NotifyPropertyChangedRecipients]
         private bool _selected = false;
-
+        public bool Selected
+        {
+            get { return _selected; }
+            set
+            {
+                if (_selected != value)
+                {
+                    _selected = value;
+                    OnPropertyChanged(nameof(Selected));
+                    ItemsToDisplay[0].IsSelected = value;
+                }
+            }
+        }
 
 
         // REARCHITECT so this this is a WTFDicomDataset instead..................................
         public WTFDicomDataset? MyDicomDataset { get; private set; }
-
-        //public ObservableCollection<WTFDicomItem> TagsAndValuesList
-        //{
-        //    get;
-        //}
 
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
         public List<DicomTag> TagColumnsToDisplay { get; set; } = new();
@@ -103,17 +110,18 @@ namespace WTF_DICOM.Models
             foreach (var item in NonTagColumnsToDisplay)
             {
                 WTFDicomItem wtfItem = null;
+                bool isTag = false;
                 switch (item)
                 {
                     case (MainWindowViewModel.NonTagColumnTypes.COUNT):
                         wtfItem =
-                            new WTFDicomItem(false, ReferencedOrRelatedDicomFiles.Count + 1,
+                            new WTFDicomItem(isTag, ReferencedOrRelatedDicomFiles.Count + 1,
                             MainWindowViewModel.NonTagColumnTypeDictionary.GetValueOrDefault(MainWindowViewModel.NonTagColumnTypes.COUNT, "Count"));
                         break;
                     case (MainWindowViewModel.NonTagColumnTypes.SELECT):
                         string label = MainWindowViewModel.NonTagColumnTypeDictionary.GetValueOrDefault(MainWindowViewModel.NonTagColumnTypes.SELECT, "Select");
-                        wtfItem =
-                            new WTFDicomItem(false, label, label);
+                        bool defaultSelected = false;
+                        wtfItem = new WTFDicomItem(isTag, defaultSelected, label); // not actually synced with Selected
                         break;
                 }
                 if (wtfItem != null) { ItemsToDisplay.Add(wtfItem); }
