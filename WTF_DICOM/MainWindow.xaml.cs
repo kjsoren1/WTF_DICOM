@@ -101,6 +101,12 @@ public partial class MainWindow
                 showRelatedFilesItem.CommandParameter = cell.DataContext;
                 customContextMenu.Items.Add(showRelatedFilesItem);
 
+                // SELECT ALL REFERENCED FILES
+                MenuItem selectAllReferencedFilesItem = new MenuItem { Header = "Select All Referenced Files" };
+                selectAllReferencedFilesItem.Command = _viewModel.SelectAllReferencedFilesCommand;
+                selectAllReferencedFilesItem.CommandParameter = cell.DataContext;
+                customContextMenu.Items.Add(selectAllReferencedFilesItem);
+
                 // Assign the new ContextMenu to the element
                 fe.ContextMenu = customContextMenu;
                 fe.ContextMenu.IsOpen = true;

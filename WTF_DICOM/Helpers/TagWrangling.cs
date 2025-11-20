@@ -1,4 +1,6 @@
-﻿using FellowOakDicom;
+﻿using System.Collections.ObjectModel;
+
+using FellowOakDicom;
 
 using WTF_DICOM.Models;
 
@@ -124,6 +126,13 @@ namespace WTF_DICOM.Helpers
             return references;
         }
 
+        public static List<DicomItem> GetAllReferencedSOPInstanceUID(DicomFileCommon dicomFileCommon)
+        {
+            List<DicomItem> references = new List<DicomItem>();
+            GetAllReferencedSOPInstanceUID(dicomFileCommon.OpenedFile.Dataset, references);
+            return references;
+        }
+
         public static void GetAllReferencedSOPInstanceUID(DicomDataset dicomDataset, List<DicomItem> referencedSOPInstanceUIDItems)
         {
             if (dicomDataset == null) return;
@@ -150,6 +159,115 @@ namespace WTF_DICOM.Helpers
             }
         }
 
+        public static ObservableCollection<ReferencedSOPInstanceUIDInfo> GetReferencedSOPInstanceUIDs(WTFDicomItem tag, ObservableCollection<DicomFileCommon> dicomFiles)
+        {
+            if (tag == null) return new ObservableCollection<ReferencedSOPInstanceUIDInfo>();
+
+            List<DicomItem> referenceDicomItems = GetAllReferencedSOPInstanceUID(tag);
+            return GetReferencedSOPInstanceUIDs(referenceDicomItems, dicomFiles);
+        }
+
+        public static ObservableCollection<ReferencedSOPInstanceUIDInfo> GetReferencedSOPInstanceUIDs(DicomFileCommon dicomFileCommon, ObservableCollection<DicomFileCommon> dicomFiles)
+        {
+            if (dicomFileCommon == null) return new ObservableCollection<ReferencedSOPInstanceUIDInfo>();
+
+            List<DicomItem> referenceDicomItems = GetAllReferencedSOPInstanceUID(dicomFileCommon);
+            return GetReferencedSOPInstanceUIDs(referenceDicomItems, dicomFiles);
+        }
+
+
+        public static ObservableCollection<ReferencedSOPInstanceUIDInfo> GetReferencedSOPInstanceUIDs(List<DicomItem> referenceDicomItems, ObservableCollection<DicomFileCommon> dicomFiles)
+        {               
+            ObservableCollection<ReferencedSOPInstanceUIDInfo> referencedFiles = new ObservableCollection<ReferencedSOPInstanceUIDInfo>();
+            foreach (DicomItem item in referenceDicomItems)
+            {
+                string referencedSOPInstanceUID = "";
+                if (item is DicomElement element)
+                {
+                    referencedSOPInstanceUID = element.Get<string>();
+                }
+
+                bool found = false;
+                // try to find file in our list of known files
+                foreach (DicomFileCommon dicomFileCommon in dicomFiles)
+                {
+                    if (referencedSOPInstanceUID.Equals(dicomFileCommon.SOPInstanceUID))
+                    {
+                        ReferencedSOPInstanceUIDInfo referencedFile =
+                            new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, dicomFileCommon.DicomFileName, dicomFileCommon.Modality);
+                        referencedFiles.Add(referencedFile);
+                        found = true;
+                        break;
+                    }
+                    foreach (DicomFileCommon relatedFile in dicomFileCommon.RelatedDicomFiles)
+                    {
+                        if (referencedSOPInstanceUID.Equals(relatedFile.SOPInstanceUID))
+                        {
+                            ReferencedSOPInstanceUIDInfo referencedFile =
+                                new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, relatedFile.DicomFileName, relatedFile.Modality);
+                            referencedFiles.Add(referencedFile);
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!found)
+                {
+                    ReferencedSOPInstanceUIDInfo referencedFile =
+                        new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, "no file found", "unknown");
+                    referencedFiles.Add(referencedFile);
+                }
+            }
+            return referencedFiles;
+        }
+
+
+        public static int SelectReferencedSOPInstanceUIDs(DicomFileCommon dicomFileCommon, ObservableCollection<DicomFileCommon> dicomFiles)
+        {
+            if (dicomFileCommon == null) return -1;
+
+            List<DicomItem> referenceDicomItems = GetAllReferencedSOPInstanceUID(dicomFileCommon);
+            return SelectReferencedSOPInstanceUIDs(referenceDicomItems, dicomFiles);
+        }
+
+        public static int SelectReferencedSOPInstanceUIDs(List<DicomItem> referenceDicomItems, ObservableCollection<DicomFileCommon> dicomFiles)
+        {      
+            int nReferencedAndNotFound = 0;
+            foreach (DicomItem item in referenceDicomItems)
+            {
+                string referencedSOPInstanceUID = "";
+                if (item is DicomElement element)
+                {
+                    referencedSOPInstanceUID = element.Get<string>();
+                }
+
+                bool found = false;
+                // try to find file in our list of known files
+                foreach (DicomFileCommon dicomFileCommon in dicomFiles)
+                {
+                    if (referencedSOPInstanceUID.Equals(dicomFileCommon.SOPInstanceUID))
+                    {
+                        dicomFileCommon.Selected = true;
+                        found = true;
+                        break;
+                    }
+                    foreach (DicomFileCommon relatedFile in dicomFileCommon.RelatedDicomFiles)
+                    {
+                        if (referencedSOPInstanceUID.Equals(relatedFile.SOPInstanceUID))
+                        {
+                            relatedFile.Selected = true;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!found)
+                {
+                    nReferencedAndNotFound++;
+                }
+            }
+            return nReferencedAndNotFound;
+        }
 
         public static string SequenceRepresentativeString(DicomSequence seq, DicomTag dicomTag)
         {

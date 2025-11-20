@@ -38,7 +38,7 @@ namespace WTF_DICOM.Models
         {
             get
             {
-                return ReferencedOrRelatedDicomFiles.Count + 1;
+                return RelatedDicomFiles.Count + 1;
             }
         }
 
@@ -54,7 +54,8 @@ namespace WTF_DICOM.Models
                 {
                     _selected = value;
                     OnPropertyChanged(nameof(Selected));
-                    ItemsToDisplay[0].IsSelected = value;
+                    if (ItemsToDisplay.Count > 0)
+                        ItemsToDisplay[0].IsSelected = value;
                 }
             }
         }
@@ -66,7 +67,7 @@ namespace WTF_DICOM.Models
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();
         public List<DicomTag> TagColumnsToDisplay { get; set; } = new();
         public List<NonTagColumnTypes> NonTagColumnsToDisplay { get; set; } = new();
-        public ObservableCollection<DicomFileCommon> ReferencedOrRelatedDicomFiles { get; } = new();
+        public ObservableCollection<DicomFileCommon> RelatedDicomFiles { get; } = new();
 
 
 
@@ -115,7 +116,7 @@ namespace WTF_DICOM.Models
                 {
                     case (MainWindowViewModel.NonTagColumnTypes.COUNT):
                         wtfItem =
-                            new WTFDicomItem(isTag, ReferencedOrRelatedDicomFiles.Count + 1,
+                            new WTFDicomItem(isTag, RelatedDicomFiles.Count + 1,
                             MainWindowViewModel.NonTagColumnTypeDictionary.GetValueOrDefault(MainWindowViewModel.NonTagColumnTypes.COUNT, "Count"));
                         break;
                     case (MainWindowViewModel.NonTagColumnTypes.SELECT):

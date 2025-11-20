@@ -23,7 +23,7 @@ namespace WTF_DICOM
 
         public SimpleDicomFilesViewModel(DicomFileCommon representativeFile)
         {
-            ReferencedOrRelatedDicomFiles = representativeFile.ReferencedOrRelatedDicomFiles;
+            ReferencedOrRelatedDicomFiles = representativeFile.RelatedDicomFiles;
             RepresentativeFile = representativeFile;
         }        
     }

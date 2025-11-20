@@ -137,7 +137,7 @@ public partial class MainWindowViewModel : ObservableRecipient
                 filesToShow.Add($"{dfc.DicomFileName}");
                 if (dfc.NumberRelatedFiles > 0)
                 {
-                    foreach (DicomFileCommon rdfc in dfc.ReferencedOrRelatedDicomFiles)
+                    foreach (DicomFileCommon rdfc in dfc.RelatedDicomFiles)
                     {
                         filesToShow.Add($"{rdfc.DicomFileName}");
                     }
@@ -219,6 +219,16 @@ public partial class MainWindowViewModel : ObservableRecipient
         RemoveColumnFromDisplayHelper(colTag);
     }
 
+    [RelayCommand]
+    public void SelectAllReferencedFiles(DicomFileCommon dicomFileCommon)
+    {
+        if (dicomFileCommon == null) return;
+        int nRefererencedNotFound = 
+                Helpers.TagWrangling.SelectReferencedSOPInstanceUIDs(dicomFileCommon, DicomFiles);
+
+        // TODO - make sure references of the related files also get selected
+    }
+
     #endregion
 
     [RelayCommand]
@@ -271,7 +281,7 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         if (existingFile != null)
         {
-            existingFile.ReferencedOrRelatedDicomFiles.Add(fileToAdd);
+            existingFile.RelatedDicomFiles.Add(fileToAdd);
         }
         else
         {
