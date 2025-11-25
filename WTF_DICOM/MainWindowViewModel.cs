@@ -44,6 +44,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     private string? _directorySelected = "dirToBe";
 
     public ObservableCollection<DicomFileCommon> DicomFiles { get; } = new();
+    public ObservableCollection<DicomFileCommon> NonDicomFiles { get; } = new();
     public ICollectionView DicomFilesView { get; } // used for filtering
 
     public List<DicomTag> TagColumnsToDisplay { get; private set; } = new();
@@ -93,19 +94,16 @@ public partial class MainWindowViewModel : ObservableRecipient
 
             DicomFiles.Clear();
 
-            // add all files in this directory to DicomFiles
-            foreach (string fileName in Directory.EnumerateFiles(DirectorySelected))
-            {
-                AddFileToDicomFiles(fileName, false);
-            }
+            ReadDirectoryRecursive(DirectorySelected);
+
             // delay setting items to display so that the related file count is correct
             foreach (var dcmFile in DicomFiles)
             {
                 dcmFile.SetItemsToDisplay();
             }
-
         }
     }
+
 
     //[RelayCommand(IncludeCancelCommand = false)]
     [RelayCommand]
@@ -241,6 +239,20 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     #region HELPER_FUNCTIONS
 
+    private void ReadDirectoryRecursive(string directory)
+    {
+        // add all files in this directory to DicomFiles
+        foreach (string fileName in Directory.EnumerateFiles(directory))
+        {
+            AddFileToDicomFiles(fileName, false);
+        }
+
+        foreach (string subDirectory in Directory.EnumerateDirectories(directory))
+        {
+            ReadDirectoryRecursive(subDirectory);
+        }
+    }
+
     private DicomFileCommon? FindSeriesWSameModalityInList(DicomFileCommon? dicomFile)
     {
         if (dicomFile == null) return null;
@@ -275,6 +287,11 @@ public partial class MainWindowViewModel : ObservableRecipient
     private void AddFileToDicomFiles(string fileName, bool refreshDisplay)
     {
         DicomFileCommon fileToAdd = new DicomFileCommon(fileName);
+        if (!fileToAdd.IsDicomFile)
+        {
+            NonDicomFiles.Add(fileToAdd);
+            return;
+        }
         DicomFileCommon? existingFile = null;
 
         existingFile = FindSeriesWSameModalityInList(fileToAdd);

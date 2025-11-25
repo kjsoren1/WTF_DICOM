@@ -97,12 +97,10 @@ namespace WTF_DICOM.Models
         public DicomFileCommon(string? dicomFileName)
         {
             _dicomFileName = dicomFileName;
-            //TagsAndValuesList = new ObservableCollection<WTFDicomItem>();
 
-            ReadModalityFromFile();
+            ReadModalityFromFile(); // NOTE - this will populate OpenedFile
             ReadSOPInstanceUIDFromFile();
             ReadSeriesInstanceUIDFromFile();
-            //ReadAllTags();
         }
 
         public void SetItemsToDisplay()
@@ -136,14 +134,12 @@ namespace WTF_DICOM.Models
 
         public void AddItemToDisplay(DicomTag colTag)
         {
-            //ColumnsToDisplay.Add(colTag); // I think this is already done
-
             string value = "";
             bool isSequence = false;
             DicomSequence seq = null;
             try
             {
-                if (IsDicomFile && OpenedFile != null)
+                if (OpenedFile != null && IsDicomFile)
                 {
                     isSequence = Helpers.TagWrangling.IsSequence(colTag);
                     if (isSequence)
@@ -179,7 +175,7 @@ namespace WTF_DICOM.Models
 
         private void ReadModalityFromFile()
         {
-            if (OpenedFile != null)
+            if (OpenedFile != null && IsDicomFile)
             {
                 Modality = OpenedFile.Dataset.GetString(DicomTag.Modality);
             }
@@ -187,7 +183,7 @@ namespace WTF_DICOM.Models
 
         private void ReadSOPInstanceUIDFromFile()
         {
-            if (OpenedFile != null)
+            if (OpenedFile != null && IsDicomFile)
             {
                 SOPInstanceUID = OpenedFile.Dataset.GetString(DicomTag.SOPInstanceUID);
             }
@@ -195,7 +191,7 @@ namespace WTF_DICOM.Models
 
         private void ReadSeriesInstanceUIDFromFile()
         {
-            if (OpenedFile != null)
+            if (OpenedFile != null && IsDicomFile)
             {
                 SeriesInstanceUID = OpenedFile.Dataset.GetString(DicomTag.SeriesInstanceUID);
             }
@@ -203,9 +199,10 @@ namespace WTF_DICOM.Models
 
         public void ReadAllTags()
         {
-            if (OpenedFile == null) return;
-
-            MyDicomDataset = new WTFDicomDataset(OpenedFile.Dataset);
+            if (OpenedFile != null && IsDicomFile)
+            {
+                MyDicomDataset = new WTFDicomDataset(OpenedFile.Dataset);
+            }
         }      
 
     }
