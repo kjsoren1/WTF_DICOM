@@ -1,9 +1,11 @@
-﻿<Window x:Class="WTF_DICOM.SimpleDicomFilesWindow"
+﻿<syncfusion:ChromelessWindow x:Class="WTF_DICOM.SimpleDicomFilesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf" 
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:models="clr-namespace:WTF_DICOM.Models" d:DataContext="{d:DesignInstance Type=models:DicomFileCommon}"
+        xmlns:models="clr-namespace:WTF_DICOM.Models" 
+        d:DataContext="{d:DesignInstance Type=models:DicomFileCommon}"
         mc:Ignorable="d"
         Title="SimpleDicomFilesWindow" Height="450" Width="800">
   <Grid>
@@ -29,7 +31,7 @@
            HorizontalScrollBarVisibility="Visible"
            IsReadOnly="True"
            SelectionMode="Single" SelectionUnit="Cell"
-           AlternationCount="2" AlternatingRowBackground="DarkViolet">
+           AlternationCount="2" AlternatingRowBackground="LightBlue">
       <DataGrid.Columns>
         <DataGridTextColumn Binding="{Binding Modality}" Header="Modality" />
         <DataGridTextColumn Binding="{Binding SOPInstanceUID}" Header="SOPInstanceUID" />
@@ -38,4 +40,4 @@
     </DataGrid>
 
   </Grid>
-</Window>
+</syncfusion:ChromelessWindow>

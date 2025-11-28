@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 using CommunityToolkit.Mvvm.Input;
+using Syncfusion.Windows.Shared;
 
 using FellowOakDicom;
 
@@ -25,7 +26,7 @@ namespace WTF_DICOM
     /// <summary>
     /// Interaction logic for TagsAndValuesWindow.xaml
     /// </summary>
-    public partial class TagsAndValuesWindow : Window
+    public partial class TagsAndValuesWindow : ChromelessWindow
     {
 
         private readonly TagsAndValuesViewModel _viewModel;

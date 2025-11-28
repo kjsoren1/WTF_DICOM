@@ -14,8 +14,6 @@ using Microsoft.Win32;
 
 using WTF_DICOM.Models;
 
-using static MaterialDesignThemes.Wpf.Theme.ToolBar;
-
 namespace WTF_DICOM
 {
     public partial class TagsAndValuesViewModel : ObservableRecipient

@@ -13,14 +13,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using Syncfusion.Windows.Shared;
+
 using WTF_DICOM.Models;
+
 
 namespace WTF_DICOM;
 
 /// <summary>
 /// Interaction logic for SimpleDicomFilesViewModel.xaml
 /// </summary>
-public partial class SimpleDicomFilesWindow : Window
+public partial class SimpleDicomFilesWindow : ChromelessWindow
 {
     private readonly SimpleDicomFilesViewModel _viewModel;
     

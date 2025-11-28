@@ -21,9 +21,6 @@ using Newtonsoft.Json;
 
 using WTF_DICOM.Models;
 
-using static MaterialDesignThemes.Wpf.Theme;
-using static MaterialDesignThemes.Wpf.Theme.ToolBar;
-
 namespace WTF_DICOM;
 
 public partial class MainWindowViewModel : ObservableRecipient
@@ -149,7 +146,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     private void SaveDisplayAsTemplate()
     {
         DisplayTemplate toSave = new DisplayTemplate();
-        toSave.GroupsAndElements = Helpers.TagWrangling.GetGroupsElementsFromTags(TagColumnsToDisplay);
+        toSave.GroupsAndElements = Helpers.TagWrangling.GetGroupsElementsFromTags(TagColumnsToDisplay); // TODO: proprietary tags
         toSave.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
 
         string jsonString = JsonConvert.SerializeObject(toSave);
@@ -161,6 +158,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     {
         string loadedJson = File.ReadAllText("templates.json");
         DisplayTemplate? toLoad = JsonConvert.DeserializeObject<DisplayTemplate>(loadedJson);
+        if (toLoad == null ) return;
         TagColumnsToDisplay = Helpers.TagWrangling.GetTagsFromGroupsAndElements(toLoad.GroupsAndElements);
         NonTagColumnsToDisplay = toLoad.NonTagColumnsToDisplay;
     }

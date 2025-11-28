@@ -39,12 +39,14 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="fo-dicom" />
-    <PackageReference Include="MaterialDesignThemes" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Syncfusion.Grid.WPF" />
     <PackageReference Include="Syncfusion.Licensing" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" />
     <PackageReference Include="Syncfusion.Shared.WPF" />
+    <PackageReference Include="Syncfusion.Tools.WPF" />
   </ItemGroup>
 
   <ItemGroup>

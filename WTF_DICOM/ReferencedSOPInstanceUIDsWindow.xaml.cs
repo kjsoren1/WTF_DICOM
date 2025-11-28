@@ -6,8 +6,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using CommunityToolkit.Mvvm.Input;
+using Syncfusion.Windows.Shared;
 
 using WTF_DICOM.Models;
+
 
 
 namespace WTF_DICOM;
@@ -15,7 +17,7 @@ namespace WTF_DICOM;
 /// <summary>
 /// Interaction logic for ReferencedSOPInstanceUIDsWindow.xaml
 /// </summary>
-public partial class ReferencedSOPInstanceUIDsWindow : Window
+public partial class ReferencedSOPInstanceUIDsWindow : ChromelessWindow
 {
     
     private readonly ReferencedSOPInstanceUIDViewModel _viewModel;

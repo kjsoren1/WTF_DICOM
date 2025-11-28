@@ -1,4 +1,6 @@
-﻿<Window x:Class="WTF_DICOM.TagsAndValuesWindow"
+﻿<syncfusion:ChromelessWindow 
+        x:Class="WTF_DICOM.TagsAndValuesWindow"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf" 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -46,7 +48,7 @@
           </Style.Triggers>
         </Style>
       </StackPanel.Style>
-      
+
     </StackPanel>
 
     <!--Content - List of tags and values-->
@@ -58,7 +60,7 @@
               HorizontalScrollBarVisibility="Visible"
               IsReadOnly="True"
               SelectionMode="Single" SelectionUnit="Cell"
-              AlternationCount="2" AlternatingRowBackground="DarkViolet">
+              AlternationCount="2" AlternatingRowBackground="LightCyan">
       <DataGrid.Columns>
         <DataGridTextColumn Binding="{Binding TagAsString}" Header="Dicom Tag {Group, Element}" />
         <DataGridTextColumn Binding="{Binding TagInWords}" Header="Dicom Tag Name" />
@@ -76,7 +78,8 @@
           <MenuItem Header="Show Sequence"
                     Command="{Binding ShowSequenceCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedCells[0].Item}">
-            --><!--<MenuItem.Style>
+            -->
+      <!--<MenuItem.Style>
               <Style TargetType="{x:Type MenuItem}">
                 <Setter Property="Visibility" Value="Visible"/>
                 <Style.Triggers>
@@ -85,7 +88,8 @@
                   </DataTrigger>
                 </Style.Triggers>
               </Style>
-            </MenuItem.Style>--><!--
+            </MenuItem.Style>-->
+      <!--
           </MenuItem>
           <MenuItem Header="Add Tag to Display"
                     Command="{Binding AddTagToDisplayCommand}"
@@ -105,4 +109,4 @@
     </DataGrid>
 
   </Grid>
-</Window>
+</syncfusion:ChromelessWindow>
