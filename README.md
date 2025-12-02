@@ -1,5 +1,13 @@
 # WTF_DICOM
 
+# TOTALLY REDONE TODOs
+syncfusion migration
+ - automatic resizing of columns
+ - programmatically add contentControl and datagrids of TagsAndValues to it's DockingManager
+ - fuss with margins
+
+
+
 # TODOS
 Templates
  - basic template saved (save existing display as a template, load it later)
