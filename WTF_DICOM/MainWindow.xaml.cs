@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -6,6 +7,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using CommunityToolkit.Mvvm.Input;
+
+using Syncfusion.UI.Xaml.Grid;
 
 using WTF_DICOM.Models;
 
@@ -24,8 +27,60 @@ public partial class MainWindow
 
         DataContext = _viewModel = viewModel;
         viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);
+        AddRecordContextMenuToDataGrid();
 
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
+    }
+
+    private void AddRecordContextMenuToDataGrid()
+    {
+        DicomFileCommonDataGrid.RecordContextMenu = new ContextMenu();
+
+        // COPY TO CLIPBOARD
+        MenuItem copyToClipboardItem = new MenuItem { Header = "Copy Cell To Clipboard" };
+        copyToClipboardItem.Click += _viewModel.CopyToClipboard;
+        DicomFileCommonDataGrid.RecordContextMenu.Items.Add(copyToClipboardItem);
+
+        // SHOW ALL TAGS
+        MenuItem showAllTagsItem = new MenuItem { Header = "Show All Tags" };
+        showAllTagsItem.Click += _viewModel.ShowAllTags;
+        DicomFileCommonDataGrid.RecordContextMenu.Items.Add(showAllTagsItem);
+
+        // SHOW IN FOLDER
+        MenuItem showInFolderItem = new MenuItem { Header = "Show in Folder" };
+        showInFolderItem.Click += _viewModel.ShowInFolder;
+        DicomFileCommonDataGrid.RecordContextMenu.Items.Add(showInFolderItem);
+
+        // SELECT ALL REFERENCED FILES
+        MenuItem selectAllReferencedFilesItem = new MenuItem { Header = "Select All Referenced Files" };
+        selectAllReferencedFilesItem.Click += _viewModel.SelectAllReferencedFiles;
+        DicomFileCommonDataGrid.RecordContextMenu.Items.Add(selectAllReferencedFilesItem);
+
+        // DataContexts will be set in the following when cell/row clicked
+        DicomFileCommonDataGrid.GridContextMenuOpening += DicomFileCommonDataGrid_GridContextMenuOpening;
+    }
+
+    private void DicomFileCommonDataGrid_GridContextMenuOpening(object? sender, GridContextMenuEventArgs e)
+    {
+        int idx = e.RowColumnIndex.ColumnIndex;
+
+        if (e.ContextMenuInfo is GridRecordContextMenuInfo recordInfo)
+        {
+            // Access the data object of the right-clicked row
+            var dataObject = recordInfo.Record;
+            // You can now access properties of dataObject and potentially set them as Tag or CommandParameter for your MenuItems
+            // Example: Pass the entire dataObject to a MenuItem's Tag
+            foreach (MenuItem item in DicomFileCommonDataGrid.RecordContextMenu.Items)
+            {
+                item.Tag = dataObject;
+            }
+        }
+        //else if (e.ContextMenuInfo is Header headerInfo)
+        //{
+        //    // Access the column information
+        //    var column = headerInfo.Column;
+        //    // Similar to above, pass column info to MenuItems
+        //}
     }
 
     public void CellClick(object sender, RoutedEventArgs e)
@@ -46,122 +101,6 @@ public partial class MainWindow
         }
     }
 
-    private bool IsHeader(ContextMenuEventArgs e)
-    {
-        DependencyObject dep = (DependencyObject)e.OriginalSource;
-        while ((dep != null) && !(dep is DataGridCell) && !(dep is DataGridColumnHeader))
-        {
-            dep = VisualTreeHelper.GetParent(dep);
-        }
-        return (dep != null && dep is DataGridColumnHeader);
-    }
-
-    public void DataGridContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)
-    {
-        DependencyObject dep = (DependencyObject)e.OriginalSource;
-        while ((dep != null) && !(dep is DataGridCell) && !(dep is DataGridColumnHeader))
-        {
-            dep = VisualTreeHelper.GetParent(dep);
-        }
-        if (dep == null) return;
-        if (dep is DataGridCell)
-        {
-            DataGridCell cell = dep as DataGridCell;
-            if (cell == null) { return; }
-            int idx = cell.Column.DisplayIndex;
-            // Get the element that raised the event
-            FrameworkElement fe = e.Source as FrameworkElement;
-            if (fe != null)
-            {
-                // Example: Create a new ContextMenu dynamically
-                ContextMenu customContextMenu = new ContextMenu();
-                customContextMenu.DataContext = cell.DataContext;
-
-                // COPY TO CLIPBOARD
-                MenuItem copyToClipboardItem = new MenuItem { Header = "Copy Cell To Clipboard" };
-                copyToClipboardItem.Command = _viewModel.CopyToClipboardCommand;
-                copyToClipboardItem.CommandParameter = cell.DataContext;
-                customContextMenu.Items.Add(copyToClipboardItem);
-
-                // SHOW ALL TAGS
-                MenuItem showAllTagsItem = new MenuItem { Header = "Show All Tags" };
-                showAllTagsItem.Command = _viewModel.ShowAllTagsCommand;
-                showAllTagsItem.CommandParameter = cell.DataContext;
-                customContextMenu.Items.Add(showAllTagsItem);
-
-                // SHOW IN FOLDER
-                MenuItem showInFolderItem = new MenuItem { Header = "Show in Folder" };
-                showInFolderItem.Command = _viewModel.ShowInFolderCommand;
-                showInFolderItem.CommandParameter = cell.DataContext;
-                customContextMenu.Items.Add(showInFolderItem);
-
-                // SHOW RELATED FILES
-                MenuItem showRelatedFilesItem = new MenuItem { Header = "Show Related Files" };
-                showRelatedFilesItem.Command = _viewModel.ShowRelatedFilesCommand;
-                showRelatedFilesItem.CommandParameter = cell.DataContext;
-                customContextMenu.Items.Add(showRelatedFilesItem);
-
-                // SELECT ALL REFERENCED FILES
-                MenuItem selectAllReferencedFilesItem = new MenuItem { Header = "Select All Referenced Files" };
-                selectAllReferencedFilesItem.Command = _viewModel.SelectAllReferencedFilesCommand;
-                selectAllReferencedFilesItem.CommandParameter = cell.DataContext;
-                customContextMenu.Items.Add(selectAllReferencedFilesItem);
-
-                // Assign the new ContextMenu to the element
-                fe.ContextMenu = customContextMenu;
-                fe.ContextMenu.IsOpen = true;
-
-                // Optional: Mark the event as handled to prevent the default ContextMenu from opening
-                // This is particularly important if you want to completely replace a pre-existing ContextMenu.
-                // If the element initially has no ContextMenu, marking it handled might not be necessary,
-                // but it's good practice for consistency.
-                e.Handled = true;
-            }
-        }
-    }
-
-    public void DataGridHeaderContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)
-    {
-        DependencyObject dep = (DependencyObject)e.OriginalSource;
-        while ((dep != null) && !(dep is DataGridCell) && !(dep is DataGridColumnHeader))
-        {
-            dep = VisualTreeHelper.GetParent(dep);
-        }
-        if (dep == null) return;
-        if (dep is DataGridColumnHeader)
-        {
-            DataGridColumnHeader colHeader = dep as DataGridColumnHeader;
-            if (colHeader == null) { return; }
-            int idx = colHeader.Column.DisplayIndex;
-            // Get the element that raised the event
-            FrameworkElement fe = e.Source as FrameworkElement;
-            if (fe != null)
-            {
-                // Example: Create a new ContextMenu dynamically
-                ContextMenu customContextMenu = new ContextMenu();
-                customContextMenu.DataContext = colHeader.DataContext;
-
-                if (idx >= _viewModel.NonTagColumnsToDisplay.Count)
-                {
-                    // REMOVE COLUMN FROM DISPLAY
-                    MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
-                    removeColumnFromDisplayItem.Command = _viewModel.RemoveColumnFromDisplayByIndexCommand;
-                    removeColumnFromDisplayItem.CommandParameter = idx;
-                    customContextMenu.Items.Add(removeColumnFromDisplayItem);
-                }
-
-                // Assign the new ContextMenu to the element
-                fe.ContextMenu = customContextMenu;
-                fe.ContextMenu.IsOpen = true;
-
-                // Optional: Mark the event as handled to prevent the default ContextMenu from opening
-                // This is particularly important if you want to completely replace a pre-existing ContextMenu.
-                // If the element initially has no ContextMenu, marking it handled might not be necessary,
-                // but it's good practice for consistency.
-                e.Handled = true;
-            }
-        }
-    }
 
     private void OnClose(object sender, ExecutedRoutedEventArgs e)
     {
@@ -170,12 +109,20 @@ public partial class MainWindow
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        MainWindowLayoutGrid.Width = e.NewSize.Width;
-        MainWindowLayoutGrid.Height = e.NewSize.Height - 30 - 20;
-        //- MainWindowLayoutGrid.RowDefinitions[0].ActualHeight
-        //- MainWindowLayoutGrid.RowDefinitions[1].ActualHeight; // margin for menu and toolbar
-        DicomFileCommonDataGrid.Height = MainWindowLayoutGrid.Height - 50; // margin for scrollbar
-        DicomFileCommonDataGrid.Width = MainWindowLayoutGrid.Width - 30; // margin for scrollbar
-        //OnPropertyChanged(nameof(DicomFileCommonDataGrid)); // doesn't work here?
+        //MainWindowLayoutGrid.Width = e.NewSize.Width;
+        //MainWindowLayoutGrid.Height = e.NewSize.Height - 30 - 20;
+        ////- MainWindowLayoutGrid.RowDefinitions[0].ActualHeight
+        ////- MainWindowLayoutGrid.RowDefinitions[1].ActualHeight; // margin for menu and toolbar
+        //DicomFileCommonDataGrid.Height = MainWindowLayoutGrid.Height - 50; // margin for scrollbar
+        //DicomFileCommonDataGrid.Width = MainWindowLayoutGrid.Width - 30; // margin for scrollbar
+        ////OnPropertyChanged(nameof(DicomFileCommonDataGrid)); // doesn't work here?
+    }
+
+    private void DicomFileCommonDataGrid_CurrentCellActivated(object sender, CurrentCellActivatedEventArgs e)
+    {
+        // Get the row and column index of the activated cell
+        int rowIndex = e.CurrentRowColumnIndex.RowIndex;
+        int columnIndex = e.CurrentRowColumnIndex.ColumnIndex;
+        _viewModel.LastSelectedCellColumnIndex = columnIndex;
     }
 }

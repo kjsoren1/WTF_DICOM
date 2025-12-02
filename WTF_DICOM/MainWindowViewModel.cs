@@ -7,6 +7,7 @@ using System.IO;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,6 +19,10 @@ using FellowOakDicom;
 
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using Syncfusion.ComponentModel;
+using Syncfusion.Data;
+using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.Windows;
 
 using WTF_DICOM.Models;
 
@@ -59,11 +64,12 @@ public partial class MainWindowViewModel : ObservableRecipient
         { { NonTagColumnTypes.COUNT, "Count" },
           { NonTagColumnTypes.SELECT, "Select" } };
 
-    private Dictionary<string, DataGridColumn> DynamicColumns { get; } = new Dictionary<string, DataGridColumn>();
+    private Dictionary<string, Syncfusion.UI.Xaml.Grid.GridColumn> DynamicColumns { get; } = 
+        new Dictionary<string, Syncfusion.UI.Xaml.Grid.GridColumn>();
     
     public int LastSelectedCellColumnIndex { get; set; } = 0; // set in MainWindow CellClick()
 
-    public System.Windows.Controls.DataGrid? MyDataGrid { get; set; }
+    public SfDataGrid? MyDataGrid { get; set; }
 
 
     public MainWindowViewModel()
@@ -167,13 +173,23 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     #region RIGHT_CLICK_FUNCTIONS
 
-    [RelayCommand]
     public void CopyToClipboard(DicomFileCommon dicomFileCommon)
     {
         Clipboard.SetText(dicomFileCommon.ItemsToDisplay[LastSelectedCellColumnIndex].ValueOfTagAsString);
     }
 
-    [RelayCommand]
+    public void CopyToClipboard(object sender, RoutedEventArgs e)
+    {
+        MenuItem menuItem = sender as MenuItem;
+        if (menuItem != null && menuItem.Tag != null)
+        {
+            if (menuItem.Tag is DicomFileCommon)
+            {
+                CopyToClipboard(menuItem.Tag as DicomFileCommon);
+            }
+        }
+    }
+
     public void ShowAllTags(DicomFileCommon dicomFileCommon)
     {
         // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
@@ -183,7 +199,18 @@ public partial class MainWindowViewModel : ObservableRecipient
         tagsAndValuesWindow.Show();
     }
 
-    [RelayCommand]
+    public void ShowAllTags(object sender, RoutedEventArgs e)
+    {
+        MenuItem menuItem = sender as MenuItem;
+        if (menuItem != null && menuItem.Tag != null)
+        {
+            if (menuItem.Tag is DicomFileCommon)
+            {
+                ShowAllTags(menuItem.Tag as DicomFileCommon);
+            }
+        }
+    }
+
     public static void ShowRelatedFiles(DicomFileCommon dicomFileCommon)
     {
         SimpleDicomFilesViewModel simpleViewModel = new SimpleDicomFilesViewModel(dicomFileCommon);
@@ -191,13 +218,57 @@ public partial class MainWindowViewModel : ObservableRecipient
         simpleDicomFilesWindow.Show();
     }
 
-    [RelayCommand]
+    public void ShowRelatedFiles(object sender, RoutedEventArgs e)
+    {
+        MenuItem menuItem = sender as MenuItem;
+        if (menuItem != null && menuItem.Tag != null)
+        {
+            if (menuItem.Tag is DicomFileCommon)
+            {
+                ShowRelatedFiles(menuItem.Tag as DicomFileCommon);
+            }
+        }
+    }
+
     public static void ShowInFolder(DicomFileCommon dicomFileCommon)
     {
         if (dicomFileCommon == null || dicomFileCommon.DicomFileName == null) return;
         string fileToShow = dicomFileCommon.DicomFileName;
         //Process.Start("explorer.exe", $"/select,\"{fileToShow}\"");
         Helpers.ShowSelectedInExplorer.FileOrFolder(fileToShow);
+    }
+
+    public void ShowInFolder(object sender, RoutedEventArgs e)
+    {
+        MenuItem menuItem = sender as MenuItem;
+        if (menuItem != null && menuItem.Tag != null)
+        {
+            if (menuItem.Tag is DicomFileCommon)
+            {
+                ShowInFolder(menuItem.Tag as DicomFileCommon);
+            }
+        }
+    }
+
+    public void SelectAllReferencedFiles(DicomFileCommon dicomFileCommon)
+    {
+        if (dicomFileCommon == null) return;
+        int nRefererencedNotFound = 
+                Helpers.TagWrangling.SelectReferencedSOPInstanceUIDs(dicomFileCommon, DicomFiles);
+
+        // TODO - make sure references of the related files also get selected
+    }
+
+    public void SelectAllReferencedFiles(object sender, RoutedEventArgs e)
+    {
+        MenuItem menuItem = sender as MenuItem;
+        if (menuItem != null && menuItem.Tag != null)
+        {
+            if (menuItem.Tag is DicomFileCommon)
+            {
+                SelectAllReferencedFiles(menuItem.Tag as DicomFileCommon);
+            }
+        }
     }
 
     [RelayCommand]
@@ -216,13 +287,26 @@ public partial class MainWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void SelectAllReferencedFiles(DicomFileCommon dicomFileCommon)
+    public void RemoveColumnFromDisplayByGridColumn(Object obj)
     {
-        if (dicomFileCommon == null) return;
-        int nRefererencedNotFound = 
-                Helpers.TagWrangling.SelectReferencedSOPInstanceUIDs(dicomFileCommon, DicomFiles);
+        if (obj==null) return;
+        string temp = obj.ToString();
+        //DicomTag colTag = TagColumnsToDisplay[colToRemove - NonTagColumnsToDisplay.Count];
+        //RemoveColumnFromDisplayHelper(colTag);
+    }
 
-        // TODO - make sure references of the related files also get selected
+    
+
+    private static void OnSortAscendingClicked(object obj)
+    {
+
+        if (obj is GridColumnContextMenuInfo)
+        {
+            var grid = (obj as GridContextMenuInfo).DataGrid;
+            var column = (obj as GridColumnContextMenuInfo).Column;
+            grid.SortColumnDescriptions.Clear();
+            grid.SortColumnDescriptions.Add(new SortColumnDescription() { ColumnName = column.MappingName, SortDirection = ListSortDirection.Ascending });
+        }
     }
 
     #endregion
@@ -309,15 +393,15 @@ public partial class MainWindowViewModel : ObservableRecipient
         //FilterByModality("RTPLAN");
     }
 
-    public void SetDataGridAndColumns(System.Windows.Controls.DataGrid dataGrid)
+    public void SetDataGridAndColumns(SfDataGrid dataGrid)
     {
         MyDataGrid = dataGrid;
         //MyDataGrid.Height = 450;
         //MyDataGrid.Width = 800;
         MyDataGrid.Columns.Clear();
-        MyDataGrid.ColumnHeaderHeight = 40;
-        MyDataGrid.MinRowHeight = 20;
-        MyDataGrid.SelectionUnit=DataGridSelectionUnit.CellOrRowHeader;
+        //MyDataGrid.ColumnHeaderHeight = 40;
+        //MyDataGrid.MinRowHeight = 20;
+        MyDataGrid.SelectionUnit=GridSelectionUnit.Cell;
         foreach (var dcmFile in DicomFiles)
         {
             dcmFile.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
@@ -349,7 +433,7 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         foreach (var col in DynamicColumns.Values)
         {
-            if (col.DisplayIndex > 1) // KJS - was this here to preserve checkbox???
+            if (!col.MappingName.Equals("Count") && !col.MappingName.Equals("Select"))  // KJS TODO
             {
                 MyDataGrid.Columns.Remove(col);
             }
@@ -362,17 +446,15 @@ public partial class MainWindowViewModel : ObservableRecipient
             if (item == NonTagColumnTypes.SELECT)
             {
                 string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.SELECT, "Select");
-                var column = new DataGridCheckBoxColumn() {
-                    Header = new TextBlock() { Text = headerString },
-                    //Binding = new Binding($"ItemsToDisplay[0].IsSelected"),
+                var column = new Syncfusion.UI.Xaml.Grid.GridCheckBoxColumn() {
+                    HeaderText = headerString,
                     IsReadOnly = false
                 };
                
                 Binding cbBinding = new Binding($"Selected");
                 cbBinding.Mode = BindingMode.TwoWay;
-                //cbBinding.Path = new PropertyPath("IsSelected");
                 cbBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-                column.Binding = cbBinding;
+                column.DisplayBinding = cbBinding;
                 MyDataGrid.Columns.Add(column);
                 DynamicColumns.Add(headerString, column);
                 ++idx;
@@ -381,9 +463,9 @@ public partial class MainWindowViewModel : ObservableRecipient
             if (item == NonTagColumnTypes.COUNT)
             {
                 string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.COUNT, "Count");
-                var column = new DataGridTextColumn() {
-                    Header = new TextBlock() { Text = headerString },
-                    Binding = new Binding($"ItemsToDisplay[1].Count")
+                var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
+                    HeaderText = headerString,
+                    DisplayBinding = new Binding($"ItemsToDisplay[1].Count")
                 };
 
                 MyDataGrid.Columns.Add(column);
@@ -394,9 +476,9 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         foreach (var colTag in TagColumnsToDisplay)
         {
-            var column = new DataGridTextColumn() {
-                Header = new TextBlock() { Text = colTag.DictionaryEntry.Name },
-                Binding = new Binding($"ItemsToDisplay[{idx}].ValueOfTagAsString")
+            var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
+                HeaderText = colTag.DictionaryEntry.Name,
+                DisplayBinding = new Binding($"ItemsToDisplay[{idx}].ValueOfTagAsString")
             };
 
             MyDataGrid.Columns.Add(column);
@@ -430,10 +512,10 @@ public partial class MainWindowViewModel : ObservableRecipient
         }        
 
         int idx = TagColumnsToDisplay.Count-1 + NonTagColumnsToDisplay.Count;
-        var column = new DataGridTextColumn()
+        var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn()
         {
-            Header = tag.DictionaryEntry.Name,
-            Binding = new Binding($"ItemsToDisplay[{idx}].ValueOfTagAsString")
+            HeaderText = tag.DictionaryEntry.Name,
+            DisplayBinding = new Binding($"ItemsToDisplay[{idx}].ValueOfTagAsString")
         };
        
         MyDataGrid.Columns.Add(column);

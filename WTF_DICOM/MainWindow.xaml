@@ -9,8 +9,8 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=False}"
         SizeChanged="Window_SizeChanged"
-        Title="WTF DICOM" Height="540" Width="1020">
-  <Grid Width="800" x:Name="MainWindowLayoutGrid">
+        Title="WTF DICOM" Height="540" Width="1220">
+  <Grid Width="1220" x:Name="MainWindowLayoutGrid">
     <Grid.RowDefinitions>
       <!--Menu-->
       <RowDefinition Height="30" />
@@ -55,6 +55,7 @@
       Grid.Column="0" Grid.Row="2"
       x:Name="MainWindowContentDockingManager"
       ContainerMode="TDI"
+      MaximizeButtonEnabled="True"
       UseNativeFloatWindow="False"
       EnableMouseHoverBackground="False"
       EnableScrollableSidePanel="True"
@@ -63,57 +64,53 @@
       PersistState="False"
       UseDocumentContainer="True">
 
+      <!-- MAIN DISPLAY -->
       <ContentControl
+          x:Name="DicomFilesContentControl"
           syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
           syncfusion:DockingManager.DesiredWidthInDockedMode="800"
           syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
           syncfusion:DockingManager.Header="Dicom Files"
           syncfusion:DockingManager.SideInDockedMode="Left"
           syncfusion:DockingManager.State="Dock"
-          syncfusion:DocumentContainer.MDIBounds="30,30,500,300"
+          syncfusion:DockingManager.SideRelativetoContainer="Left"
+          syncfusion:DocumentContainer.MDIBounds="20,20,800,300"
           BorderThickness="0">
 
-        <DataGrid
+        <syncfusion:SfDataGrid
                 ItemsSource="{Binding DicomFiles}"
-                x:Name="DicomFileCommonDataGrid"
+                x:Name="DicomFileCommonDataGrid"               
+                CurrentCellActivated="DicomFileCommonDataGrid_CurrentCellActivated"
                 AutoGenerateColumns="False"
-                VerticalScrollBarVisibility="Visible"
-                HorizontalScrollBarVisibility="Visible"
                 IsReadOnly="True"
-                CanUserDeleteRows="False"
-                CanUserAddRows="False"
-                CanUserReorderColumns="False"
-                CanUserResizeColumns="True"
-                CanUserSortColumns="False"
-                SelectionMode="Single" SelectionUnit="CellOrRowHeader"
-                AlternationCount="2" AlternatingRowBackground="LightPink">
+                SelectionMode="Single"
+                AllowFiltering="True"
+                AllowSorting="True"
+                AllowDeleting="True"
+                AllowDraggingColumns="False"
+                AllowGrouping="True"
+                AllowResizingColumns="True"
+                AlternationCount="2">
 
-          <DataGrid.CellStyle>
-            <Style TargetType="{x:Type DataGridCell}"
-               BasedOn="{StaticResource {x:Type DataGridCell}}">
-              <EventSetter Event="GotFocus" Handler="CellClick"/>
-              <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridContextMenuOpeningHandler"/>
-              <!--<Setter Property="BorderBrush" Value="DarkViolet"/>
-          <Setter Property="BorderThickness" Value="1"/>-->
-              <Setter Property="Margin" Value="10,0,0,0"/>
-              <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-          </DataGrid.CellStyle>
-
-          <DataGrid.ColumnHeaderStyle>
-            <Style TargetType="{x:Type DataGridColumnHeader}"
-               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-              <EventSetter Event="GotFocus" Handler="HeaderClick"/>
-              <EventSetter Event="ContextMenu.ContextMenuOpening" Handler="DataGridHeaderContextMenuOpeningHandler"/>
-              <Setter Property="Margin" Value="0,1,0,0"/>
-              <Setter Property="BorderThickness" Value="1"/>
-            </Style>
-          </DataGrid.ColumnHeaderStyle>
-
-
-        </DataGrid>
+        </syncfusion:SfDataGrid>
 
       </ContentControl>
+
+      <!-- RHS DISPLAY -->
+      <ContentControl
+        x:Name="TagsAndValuesContentControl"
+        syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
+        syncfusion:DockingManager.DesiredWidthInDockedMode="400"
+        syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
+        syncfusion:DockingManager.Header="Tags And Values"
+        syncfusion:DockingManager.SideInDockedMode="Right"
+        syncfusion:DockingManager.State="Dock"
+        syncfusion:DockingManager.SideRelativetoContainer="Right"
+        syncfusion:DocumentContainer.MDIBounds="30,30,500,300"
+        BorderThickness="0">
+      </ContentControl>
+
+
     </syncfusion:DockingManager>
   </Grid>
   <!--end layout Grid-->
