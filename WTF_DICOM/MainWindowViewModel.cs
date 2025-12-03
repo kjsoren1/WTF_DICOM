@@ -23,6 +23,7 @@ using Syncfusion.ComponentModel;
 using Syncfusion.Data;
 using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.Windows;
+using Syncfusion.Windows.Tools.Controls;
 
 using WTF_DICOM.Models;
 
@@ -70,7 +71,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     public int LastSelectedCellColumnIndex { get; set; } = 0; // set in MainWindow CellClick()
 
     public SfDataGrid? MyDataGrid { get; set; }
-
+    public DockingManager? TagsAndValuesDockingManager { get; set; }
 
     public MainWindowViewModel()
     {
@@ -192,11 +193,26 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     public void ShowAllTags(DicomFileCommon dicomFileCommon)
     {
+        //// make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
+        //dicomFileCommon.ReadAllTags();
+        //TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
+
+        //TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
+        //tagsAndValuesWindow.Show();
+
+        if (TagsAndValuesDockingManager == null) return;
         // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
-        dicomFileCommon.ReadAllTags();
-        TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
-        TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
-        tagsAndValuesWindow.Show();
+        try
+        {
+            dicomFileCommon.ReadAllTags();
+            TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
+
+            TagsAndValuesContentControl tagsAndValuesCC = new TagsAndValuesContentControl(tagsAndValuesViewModel);
+            
+            TagsAndValuesDockingManager.Children.Add(tagsAndValuesCC);
+        } catch (Exception ex) {
+                
+        }
     }
 
     public void ShowAllTags(object sender, RoutedEventArgs e)

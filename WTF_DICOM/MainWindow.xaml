@@ -67,10 +67,10 @@
       <!-- MAIN DISPLAY -->
       <ContentControl
           x:Name="DicomFilesContentControl"
+          syncfusion:DockingManager.Header="Dicom Files"
           syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
           syncfusion:DockingManager.DesiredWidthInDockedMode="800"
           syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
-          syncfusion:DockingManager.Header="Dicom Files"
           syncfusion:DockingManager.SideInDockedMode="Left"
           syncfusion:DockingManager.State="Dock"
           syncfusion:DockingManager.SideRelativetoContainer="Left"
@@ -98,21 +98,40 @@
 
       <!-- RHS DISPLAY -->
       <ContentControl
-        x:Name="TagsAndValuesContentControl"
+        x:Name="RHSTagsAndValuesContentControl"
+        Margin="1,0,-1,0"
         syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
         syncfusion:DockingManager.DesiredWidthInDockedMode="400"
         syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
-        syncfusion:DockingManager.Header="Tags And Values"
+        syncfusion:DockingManager.Header="File Specific Information"
         syncfusion:DockingManager.SideInDockedMode="Right"
         syncfusion:DockingManager.State="Dock"
         syncfusion:DockingManager.SideRelativetoContainer="Right"
         syncfusion:DocumentContainer.MDIBounds="30,30,500,300"
         BorderThickness="0">
+        
+        <!-- Docking Manager for TagsAndValues windows -->
+        <syncfusion:DockingManager
+          x:Name="RHSTagsAndValuesDockingManager"
+          Margin="1,0,-1,0"
+          syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
+          syncfusion:DockingManager.DesiredWidthInDockedMode="400"
+          syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
+          syncfusion:DockingManager.Header="Tags And Values"
+          syncfusion:DockingManager.SideInDockedMode="Right"
+          syncfusion:DockingManager.State="Dock"
+          DockFill="True"
+          EnableMouseHoverBackground="True"
+          IsVS2010DraggingEnabled="True">
+        </syncfusion:DockingManager>
+
       </ContentControl>
 
 
     </syncfusion:DockingManager>
   </Grid>
   <!--end layout Grid-->
+
+  
 
 </syncfusion:ChromelessWindow>

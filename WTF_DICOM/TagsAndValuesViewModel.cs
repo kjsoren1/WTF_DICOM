@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data.Common;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,6 +12,8 @@ using CommunityToolkit.Mvvm.Input;
 using FellowOakDicom;
 
 using Microsoft.Win32;
+
+using Syncfusion.UI.Xaml.Grid;
 
 using WTF_DICOM.Models;
 
@@ -21,6 +24,7 @@ namespace WTF_DICOM
         private readonly DicomFileCommon _myDicomFileCommon;
         private readonly DicomSequence? _myParentSequence;
         private MainWindowViewModel _mainWindowViewModel;
+        public SfDataGrid? TagsAndValuesDataGrid {  get; set; }
 
         [ObservableProperty]
         public string _dicomFileName = "";
@@ -50,7 +54,8 @@ namespace WTF_DICOM
         public bool _isSequence = false;
 
         public int LastSelectedCellColumnIndex { get; set; } = 0; // set in TagsAndValuesViewWindow CellClick()
-        public DataGrid? MyDataGrid { get; set; }
+        
+        public DataGrid? MyDataGrid { get; set; } // Deprecated - only used for old window
 
         public string TitleToDisplay { get; set; } = "Title";
 
@@ -61,6 +66,7 @@ namespace WTF_DICOM
             _mainWindowViewModel = mwvm;
             TagsAndValuesList = dicomFile.MyDicomDataset.TagsAndValuesList;
             TitleToDisplay = _dicomFileName;
+            CreateSfDataGrid();
         }
 
         // use this constructor when displaying the contents of a sequence
@@ -169,6 +175,31 @@ namespace WTF_DICOM
         public void Last()
         {
             SequenceEntryIndex = SequenceEntries.Count - 1;
+        }
+
+        public void CreateSfDataGrid()
+        {
+            TagsAndValuesDataGrid = new SfDataGrid();
+            TagsAndValuesDataGrid.SelectionUnit = GridSelectionUnit.Cell;
+            TagsAndValuesDataGrid.ItemsSource = TagsAndValuesList;
+
+            var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
+                HeaderText = "Dicom Tag {Group, Element}",
+                DisplayBinding = new Binding($"TagAsString")
+            };
+            TagsAndValuesDataGrid.Columns.Add(column);
+
+            column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
+                HeaderText = "Dicom Tag Name",
+                DisplayBinding = new Binding($"TagInWords")
+            };
+            TagsAndValuesDataGrid.Columns.Add(column);
+
+            column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
+                HeaderText = "Value",
+                DisplayBinding = new Binding($"ValueOfTagAsString")
+            };
+            TagsAndValuesDataGrid.Columns.Add(column);
         }
     }
 }

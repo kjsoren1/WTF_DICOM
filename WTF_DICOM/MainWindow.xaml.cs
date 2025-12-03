@@ -27,6 +27,7 @@ public partial class MainWindow
 
         DataContext = _viewModel = viewModel;
         viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);
+        viewModel.TagsAndValuesDockingManager = RHSTagsAndValuesDockingManager;
         AddRecordContextMenuToDataGrid();
 
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
