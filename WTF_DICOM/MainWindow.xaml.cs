@@ -110,8 +110,8 @@ public partial class MainWindow
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        //MainWindowLayoutGrid.Width = e.NewSize.Width;
-        //MainWindowLayoutGrid.Height = e.NewSize.Height - 30 - 20;
+        MainWindowLayoutGrid.Width = e.NewSize.Width - 10;
+        MainWindowLayoutGrid.Height = e.NewSize.Height - 30 - 20;
         ////- MainWindowLayoutGrid.RowDefinitions[0].ActualHeight
         ////- MainWindowLayoutGrid.RowDefinitions[1].ActualHeight; // margin for menu and toolbar
         //DicomFileCommonDataGrid.Height = MainWindowLayoutGrid.Height - 50; // margin for scrollbar

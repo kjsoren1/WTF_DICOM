@@ -10,7 +10,8 @@
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=False}"
         SizeChanged="Window_SizeChanged"
         Title="WTF DICOM" Height="540" Width="1220">
-  <Grid Width="1220" x:Name="MainWindowLayoutGrid">
+  <Grid Width="1210" x:Name="MainWindowLayoutGrid"
+        Margin="0,0,0,0">
     <Grid.RowDefinitions>
       <!--Menu-->
       <RowDefinition Height="30" />
@@ -19,9 +20,14 @@
       <!--Content-->
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="4" />
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="6" />
+    </Grid.ColumnDefinitions>
 
     <!--Menu-->
-    <Menu Margin="0,0,0,0" MinWidth="200" Grid.Row="0" Grid.Column="0" 
+    <Menu Margin="0,0,0,0" MinWidth="200" Grid.Row="0" Grid.Column="1" 
           HorizontalAlignment="Left" VerticalAlignment="Top" IsMainMenu="True">
       <MenuItem Header="_File" MinWidth="100">
         <MenuItem Header="Select Directory" Command="{Binding SelectDirectoryCommand}" />
@@ -52,7 +58,7 @@
 
     <!-- try using a  scrollviewer around the datagrid??? -->
     <syncfusion:DockingManager
-      Grid.Column="0" Grid.Row="2"
+      Grid.Column="1" Grid.Row="2"
       x:Name="MainWindowContentDockingManager"
       ContainerMode="TDI"
       MaximizeButtonEnabled="True"
@@ -73,8 +79,7 @@
           syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
           syncfusion:DockingManager.SideInDockedMode="Left"
           syncfusion:DockingManager.State="Dock"
-          syncfusion:DockingManager.SideRelativetoContainer="Left"
-          syncfusion:DocumentContainer.MDIBounds="20,20,800,300"
+          syncfusion:DocumentContainer.MDIBounds="2,2,800,300"
           BorderThickness="0">
 
         <syncfusion:SfDataGrid
@@ -84,6 +89,7 @@
                 AutoGenerateColumns="False"
                 IsReadOnly="True"
                 SelectionMode="Single"
+                ColumnSizer="Star"
                 AllowFiltering="True"
                 AllowSorting="True"
                 AllowDeleting="True"
@@ -99,30 +105,20 @@
       <!-- RHS DISPLAY -->
       <ContentControl
         x:Name="RHSTagsAndValuesContentControl"
-        Margin="1,0,-1,0"
+        Padding="0,0,10,0"
         syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
-        syncfusion:DockingManager.DesiredWidthInDockedMode="400"
+        syncfusion:DockingManager.DesiredWidthInDockedMode="390"
         syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
         syncfusion:DockingManager.Header="File Specific Information"
         syncfusion:DockingManager.SideInDockedMode="Right"
         syncfusion:DockingManager.State="Dock"
-        syncfusion:DockingManager.SideRelativetoContainer="Right"
-        syncfusion:DocumentContainer.MDIBounds="30,30,500,300"
-        BorderThickness="0">
+        syncfusion:DocumentContainer.MDIBounds="2,2,390,300"
+        BorderThickness="2">
         
         <!-- Docking Manager for TagsAndValues windows -->
         <syncfusion:DockingManager
           x:Name="RHSTagsAndValuesDockingManager"
-          Margin="1,0,-1,0"
-          syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
-          syncfusion:DockingManager.DesiredWidthInDockedMode="400"
-          syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
-          syncfusion:DockingManager.Header="Tags And Values"
-          syncfusion:DockingManager.SideInDockedMode="Right"
-          syncfusion:DockingManager.State="Dock"
-          DockFill="True"
-          EnableMouseHoverBackground="True"
-          IsVS2010DraggingEnabled="True">
+          DockFill="True">
         </syncfusion:DockingManager>
 
       </ContentControl>
