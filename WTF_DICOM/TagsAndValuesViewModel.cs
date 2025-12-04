@@ -182,24 +182,36 @@ namespace WTF_DICOM
             TagsAndValuesDataGrid = new SfDataGrid();
             TagsAndValuesDataGrid.SelectionUnit = GridSelectionUnit.Cell;
             TagsAndValuesDataGrid.ItemsSource = TagsAndValuesList;
+            TagsAndValuesDataGrid.AutoGenerateColumns = false;
+            
 
             var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
                 HeaderText = "Dicom Tag {Group, Element}",
+                MappingName= "TagGE",
                 DisplayBinding = new Binding($"TagAsString")
             };
             TagsAndValuesDataGrid.Columns.Add(column);
 
             column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
                 HeaderText = "Dicom Tag Name",
+                MappingName = "TagName",
                 DisplayBinding = new Binding($"TagInWords")
             };
             TagsAndValuesDataGrid.Columns.Add(column);
 
             column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
                 HeaderText = "Value",
+                MappingName = "TagValue",
                 DisplayBinding = new Binding($"ValueOfTagAsString")
             };
             TagsAndValuesDataGrid.Columns.Add(column);
+            StackedHeaderRow stackedHeaderRow = new StackedHeaderRow();
+            StackedColumn stackedColumn = new StackedColumn();
+            stackedColumn.HeaderText = TitleToDisplay;
+            stackedColumn.ChildColumns = "TagGE" + "," + "TagName" + "," + "TagValue";
+            stackedHeaderRow.StackedColumns.Add(stackedColumn);
+
+            TagsAndValuesDataGrid.StackedHeaderRows.Add(stackedHeaderRow);
         }
     }
 }

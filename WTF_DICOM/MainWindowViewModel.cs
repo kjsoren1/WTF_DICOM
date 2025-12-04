@@ -208,7 +208,7 @@ public partial class MainWindowViewModel : ObservableRecipient
             TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
 
             TagsAndValuesContentControl tagsAndValuesCC = new TagsAndValuesContentControl(tagsAndValuesViewModel);
-            
+            DockingManager.SetHeader(tagsAndValuesCC, dicomFileCommon.Modality);
             TagsAndValuesDockingManager.Children.Add(tagsAndValuesCC);
         } catch (Exception ex) {
                 
@@ -349,6 +349,12 @@ public partial class MainWindowViewModel : ObservableRecipient
         {
             ReadDirectoryRecursive(subDirectory);
         }
+
+        if (DicomFiles.Count > 0 && MyDataGrid != null)
+        {
+            MyDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
+            MyDataGrid.GridColumnSizer.Refresh();
+        }
     }
 
     private DicomFileCommon? FindSeriesWSameModalityInList(DicomFileCommon? dicomFile)
@@ -412,12 +418,9 @@ public partial class MainWindowViewModel : ObservableRecipient
     public void SetDataGridAndColumns(SfDataGrid dataGrid)
     {
         MyDataGrid = dataGrid;
-        //MyDataGrid.Height = 450;
-        //MyDataGrid.Width = 800;
         MyDataGrid.Columns.Clear();
-        //MyDataGrid.ColumnHeaderHeight = 40;
-        //MyDataGrid.MinRowHeight = 20;
         MyDataGrid.SelectionUnit=GridSelectionUnit.Cell;
+        MyDataGrid.GridColumnSizer.AutoFitMode = AutoFitMode.SmartFit;
         foreach (var dcmFile in DicomFiles)
         {
             dcmFile.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
@@ -502,6 +505,11 @@ public partial class MainWindowViewModel : ObservableRecipient
             ++idx;
         }
 
+        if (DicomFiles.Count > 0)
+        {
+            MyDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
+            MyDataGrid.GridColumnSizer.Refresh();
+        }
         OnPropertyChanged(nameof(MyDataGrid));
     }
 
