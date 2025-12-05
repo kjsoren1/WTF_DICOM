@@ -34,7 +34,6 @@ public partial class TagsAndValuesContentControl : ContentControl
     {
         DataContext = _viewModel = viewModel;
         this.Content = viewModel.TagsAndValuesDataGrid;
-        //AddChild(viewModel.MyDataGrid);
     }
 
 

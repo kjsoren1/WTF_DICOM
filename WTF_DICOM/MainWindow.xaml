@@ -128,6 +128,13 @@
   </Grid>
   <!--end layout Grid-->
 
-  
+  <Window.Resources>
+    <Style TargetType="syncfusion:GridStackedHeaderCellControl">
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+    <Style TargetType="syncfusion:GridHeaderCellControl">
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+  </Window.Resources>
 
 </syncfusion:ChromelessWindow>

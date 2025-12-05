@@ -177,38 +177,50 @@ namespace WTF_DICOM
             SequenceEntryIndex = SequenceEntries.Count - 1;
         }
 
+        private void TagsAndValuesDataGrid_CurrentCellActivated(object sender, CurrentCellActivatedEventArgs e)
+        {
+            // Get the row and column index of the activated cell
+            int rowIndex = e.CurrentRowColumnIndex.RowIndex;
+            int columnIndex = e.CurrentRowColumnIndex.ColumnIndex;
+            LastSelectedCellColumnIndex = columnIndex;
+        }
+
         public void CreateSfDataGrid()
         {
             TagsAndValuesDataGrid = new SfDataGrid();
             TagsAndValuesDataGrid.SelectionUnit = GridSelectionUnit.Cell;
             TagsAndValuesDataGrid.ItemsSource = TagsAndValuesList;
             TagsAndValuesDataGrid.AutoGenerateColumns = false;
-            
+            TagsAndValuesDataGrid.AllowFiltering = true;
+            TagsAndValuesDataGrid.AllowSorting = true;
+            TagsAndValuesDataGrid.AllowDeleting = false;
+            TagsAndValuesDataGrid.AllowResizingColumns = true;
+            TagsAndValuesDataGrid.CurrentCellActivated += TagsAndValuesDataGrid_CurrentCellActivated;
 
             var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
                 HeaderText = "Dicom Tag {Group, Element}",
-                MappingName= "TagGE",
+                MappingName= "TagAsString",
                 DisplayBinding = new Binding($"TagAsString")
             };
             TagsAndValuesDataGrid.Columns.Add(column);
 
             column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
                 HeaderText = "Dicom Tag Name",
-                MappingName = "TagName",
+                MappingName = "TagInWords",
                 DisplayBinding = new Binding($"TagInWords")
             };
             TagsAndValuesDataGrid.Columns.Add(column);
 
             column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
                 HeaderText = "Value",
-                MappingName = "TagValue",
+                MappingName = "ValueOfTagAsString",
                 DisplayBinding = new Binding($"ValueOfTagAsString")
             };
             TagsAndValuesDataGrid.Columns.Add(column);
             StackedHeaderRow stackedHeaderRow = new StackedHeaderRow();
             StackedColumn stackedColumn = new StackedColumn();
             stackedColumn.HeaderText = TitleToDisplay;
-            stackedColumn.ChildColumns = "TagGE" + "," + "TagName" + "," + "TagValue";
+            stackedColumn.ChildColumns = "TagAsString" + "," + "TagInWords" + "," + "ValueOfTagAsString";
             stackedHeaderRow.StackedColumns.Add(stackedColumn);
 
             TagsAndValuesDataGrid.StackedHeaderRows.Add(stackedHeaderRow);
