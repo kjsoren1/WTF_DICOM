@@ -84,23 +84,23 @@ public partial class MainWindow
         //}
     }
 
-    public void CellClick(object sender, RoutedEventArgs e)
-    {
-        if (sender != null)
-        {
-            DataGridCell? cell = sender as DataGridCell;
-            if (cell != null) _viewModel.LastSelectedCellColumnIndex = cell.Column.DisplayIndex;
-        }
-    }
+    //public void CellClick(object sender, RoutedEventArgs e)
+    //{
+    //    if (sender != null)
+    //    {
+    //        DataGridCell? cell = sender as DataGridCell;
+    //        if (cell != null) _viewModel.LastSelectedCellColumnIndex = cell.Column.DisplayIndex;
+    //    }
+    //}
 
-    public void HeaderClick(object sender, RoutedEventArgs e)
-    {
-        if (sender != null)
-        {
-            DataGridColumnHeader? header = sender as DataGridColumnHeader;
-            if (header != null) _viewModel.LastSelectedCellColumnIndex = header.DisplayIndex;
-        }
-    }
+    //public void HeaderClick(object sender, RoutedEventArgs e)
+    //{
+    //    if (sender != null)
+    //    {
+    //        DataGridColumnHeader? header = sender as DataGridColumnHeader;
+    //        if (header != null) _viewModel.LastSelectedCellColumnIndex = header.DisplayIndex;
+    //    }
+    //}
 
 
     private void OnClose(object sender, ExecutedRoutedEventArgs e)

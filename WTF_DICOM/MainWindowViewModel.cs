@@ -312,7 +312,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     }
 
     
-
+    // example code that was copied. Not active.
     private static void OnSortAscendingClicked(object obj)
     {
 
@@ -352,7 +352,7 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         if (DicomFiles.Count > 0 && MyDataGrid != null)
         {
-            MyDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
+            //MyDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
             MyDataGrid.GridColumnSizer.Refresh();
         }
     }

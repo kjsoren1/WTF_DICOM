@@ -83,13 +83,23 @@ namespace WTF_DICOM
             TitleToDisplay = seq.Tag.DictionaryEntry.Name;
         }
 
-        [RelayCommand]
         public void CopyToClipboard(WTFDicomItem tag)
         {
             Clipboard.SetText(tag.ValueOfTagAsString);
         }
 
-        [RelayCommand]
+        public void CopyToClipboard(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+            if (menuItem != null && menuItem.Tag != null)
+            {
+                if (menuItem.Tag is WTFDicomItem)
+                {
+                    CopyToClipboard(menuItem.Tag as WTFDicomItem);
+                }
+            }
+        }
+
         public void AddTagToDisplay(WTFDicomItem tag)
         {
             if (tag == null) return;
@@ -97,36 +107,58 @@ namespace WTF_DICOM
             _mainWindowViewModel.AddColumnToDisplay(tag.Tag);
         }
 
-        [RelayCommand]
+        public void AddTagToDisplay(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+            if (menuItem != null && menuItem.Tag != null)
+            {
+                if (menuItem.Tag is WTFDicomItem)
+                {
+                    AddTagToDisplay(menuItem.Tag as WTFDicomItem);
+                }
+            }
+        }
+
         public void AddTagToFavorites(WTFDicomItem tag)
         {
             if (tag == null) return;
             _mainWindowViewModel.AddTagToFavorites(tag.Tag);
         }
-
-        [RelayCommand]
-        public void ShowSequence(WTFDicomItem tag)
+        public void AddTagToFavorites(object sender, RoutedEventArgs e)
         {
-            if (tag == null) return;
-            if (!tag.IsSequence)   return;
-            // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
-            if (tag.MyDicomSequence == null) return;
-
-            List<WTFDicomDataset> sequenceEntries = new List<WTFDicomDataset>();
-            foreach (DicomDataset dicomDataset in tag.MyDicomSequence)
+            MenuItem menuItem = sender as MenuItem;
+            if (menuItem != null && menuItem.Tag != null)
             {
-                WTFDicomDataset dataset = new WTFDicomDataset(dicomDataset);
-                sequenceEntries.Add(dataset);
+                if (menuItem.Tag is WTFDicomItem)
+                {
+                    AddTagToFavorites(menuItem.Tag as WTFDicomItem);
+                }
             }
-
-            TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(
-                _mainWindowViewModel,
-                sequenceEntries,
-                _myDicomFileCommon,
-                tag.MyDicomSequence);
-            TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
-            tagsAndValuesWindow.Show();
         }
+
+        //[RelayCommand]
+        //public void ShowSequence(WTFDicomItem tag)
+        //{
+        //    if (tag == null) return;
+        //    if (!tag.IsSequence)   return;
+        //    // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
+        //    if (tag.MyDicomSequence == null) return;
+
+        //    List<WTFDicomDataset> sequenceEntries = new List<WTFDicomDataset>();
+        //    foreach (DicomDataset dicomDataset in tag.MyDicomSequence)
+        //    {
+        //        WTFDicomDataset dataset = new WTFDicomDataset(dicomDataset);
+        //        sequenceEntries.Add(dataset);
+        //    }
+
+        //    TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(
+        //        _mainWindowViewModel,
+        //        sequenceEntries,
+        //        _myDicomFileCommon,
+        //        tag.MyDicomSequence);
+        //    TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
+        //    tagsAndValuesWindow.Show();
+        //}
 
         [RelayCommand]
         public void ShowReferencedFiles(WTFDicomItem tag)
@@ -217,6 +249,8 @@ namespace WTF_DICOM
                 DisplayBinding = new Binding($"ValueOfTagAsString")
             };
             TagsAndValuesDataGrid.Columns.Add(column);
+
+            // Add stacked header row so we can display filename at top of grid
             StackedHeaderRow stackedHeaderRow = new StackedHeaderRow();
             StackedColumn stackedColumn = new StackedColumn();
             stackedColumn.HeaderText = TitleToDisplay;
@@ -224,6 +258,57 @@ namespace WTF_DICOM
             stackedHeaderRow.StackedColumns.Add(stackedColumn);
 
             TagsAndValuesDataGrid.StackedHeaderRows.Add(stackedHeaderRow);
+
+            // Add context menu
+            AddRecordContextMenuToDataGrid();
         }
+
+        private void AddRecordContextMenuToDataGrid()
+        {
+            TagsAndValuesDataGrid.RecordContextMenu = new ContextMenu();
+
+            // COPY TO CLIPBOARD
+            MenuItem copyToClipboardItem = new MenuItem { Header = "Copy Cell To Clipboard" };
+            copyToClipboardItem.Click += CopyToClipboard;
+            TagsAndValuesDataGrid.RecordContextMenu.Items.Add(copyToClipboardItem);
+
+            // ADD TAG TO DISPLAY
+            MenuItem addTagToDisplayItem = new MenuItem { Header = "Add Tag to Main Display" };
+            addTagToDisplayItem.Click += AddTagToDisplay;
+            TagsAndValuesDataGrid.RecordContextMenu.Items.Add(addTagToDisplayItem);
+
+            // ADD TAG TO FAVORITES
+            MenuItem addTagToFavoritesItem = new MenuItem { Header = "Add Tag to Favorites" };
+            addTagToFavoritesItem.Click += AddTagToFavorites;
+            TagsAndValuesDataGrid.RecordContextMenu.Items.Add(addTagToFavoritesItem);
+
+            // DataContexts will be set in the following when cell/row clicked
+            TagsAndValuesDataGrid.GridContextMenuOpening += TagsAndValuesDataGrid_GridContextMenuOpening;
+
+        }
+
+        private void TagsAndValuesDataGrid_GridContextMenuOpening(object? sender, GridContextMenuEventArgs e)
+        {
+            int idx = e.RowColumnIndex.ColumnIndex;
+
+            if (e.ContextMenuInfo is GridRecordContextMenuInfo recordInfo)
+            {
+                // Access the data object of the right-clicked row
+                var dataObject = recordInfo.Record;
+                // You can now access properties of dataObject and potentially set them as Tag or CommandParameter for your MenuItems
+                // Example: Pass the entire dataObject to a MenuItem's Tag
+                foreach (MenuItem item in TagsAndValuesDataGrid.RecordContextMenu.Items)
+                {
+                    item.Tag = dataObject;
+                }
+            }
+            //else if (e.ContextMenuInfo is Header headerInfo)
+            //{
+            //    // Access the column information
+            //    var column = headerInfo.Column;
+            //    // Similar to above, pass column info to MenuItems
+            //}
+        }
+
     }
 }
