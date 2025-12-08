@@ -302,12 +302,10 @@ namespace WTF_DICOM
                     item.Tag = dataObject;
                 }
             }
-            //else if (e.ContextMenuInfo is Header headerInfo)
-            //{
-            //    // Access the column information
-            //    var column = headerInfo.Column;
-            //    // Similar to above, pass column info to MenuItems
-            //}
+            else
+            {
+                // ???
+            }
         }
 
     }

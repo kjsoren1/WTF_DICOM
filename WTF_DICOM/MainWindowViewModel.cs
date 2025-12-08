@@ -68,7 +68,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     private Dictionary<string, Syncfusion.UI.Xaml.Grid.GridColumn> DynamicColumns { get; } = 
         new Dictionary<string, Syncfusion.UI.Xaml.Grid.GridColumn>();
     
-    public int LastSelectedCellColumnIndex { get; set; } = 0; // set in MainWindow CellClick()
+    public int LastSelectedCellColumnIndex { get; set; } = 0;
 
     public SfDataGrid? MyDataGrid { get; set; }
     public DockingManager? TagsAndValuesDockingManager { get; set; }
@@ -287,28 +287,9 @@ public partial class MainWindowViewModel : ObservableRecipient
         }
     }
 
-    [RelayCommand]
-    public void RemoveColumnFromDisplay(DicomFileCommon dicomFileCommon)
+    public void RemoveColumnFromDisplay(object sender, RoutedEventArgs e)
     {
-        int colToRemove = LastSelectedCellColumnIndex;
-        DicomTag colTag = TagColumnsToDisplay[colToRemove];
-        RemoveColumnFromDisplayHelper(colTag);
-    }
-
-    [RelayCommand]
-    public void RemoveColumnFromDisplayByIndex(int colToRemove)
-    {
-        DicomTag colTag = TagColumnsToDisplay[colToRemove - NonTagColumnsToDisplay.Count];
-        RemoveColumnFromDisplayHelper(colTag);
-    }
-
-    [RelayCommand]
-    public void RemoveColumnFromDisplayByGridColumn(Object obj)
-    {
-        if (obj==null) return;
-        string temp = obj.ToString();
-        //DicomTag colTag = TagColumnsToDisplay[colToRemove - NonTagColumnsToDisplay.Count];
-        //RemoveColumnFromDisplayHelper(colTag);
+        RemoveColumnFromDisplayHelper(LastSelectedCellColumnIndex);
     }
 
     
@@ -561,23 +542,16 @@ public partial class MainWindowViewModel : ObservableRecipient
         File.WriteAllText("favorites.json", jsonString);
     }
 
-    public void RemoveColumnFromDisplayHelper(DicomTag tag) 
+    public void RemoveColumnFromDisplayHelper(int lastSelectedIndex) 
     {
-        if (tag == null) return;
-        int idx = TagColumnsToDisplay.IndexOf(tag);
-        if (idx > 0)
-        {
-            idx += NonTagColumnsToDisplay.Count;
-        }
-        else
-        {
-            return; // can't currently remove the non-tag columns
-        }
+        int idx = lastSelectedIndex - NonTagColumnsToDisplay.Count;
+        DicomTag colTag = TagColumnsToDisplay[idx];
+        TagColumnsToDisplay.RemoveAt(idx);
 
         // Remove from each DicomFileCommon object, then rebuild the grid
         foreach (var dcmFile in DicomFiles)
         {
-            dcmFile.RemoveItemToDisplay(tag, idx);
+            dcmFile.RemoveItemToDisplay(colTag, lastSelectedIndex);
         }
         
         MyDataGrid.Columns.Clear();

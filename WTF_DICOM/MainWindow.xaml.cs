@@ -29,6 +29,7 @@ public partial class MainWindow
         viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);
         viewModel.TagsAndValuesDockingManager = RHSTagsAndValuesDockingManager;
         AddRecordContextMenuToDataGrid();
+        AddHeaderContextMenuToDataGrid();
 
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
     }
@@ -64,6 +65,7 @@ public partial class MainWindow
     private void DicomFileCommonDataGrid_GridContextMenuOpening(object? sender, GridContextMenuEventArgs e)
     {
         int idx = e.RowColumnIndex.ColumnIndex;
+        _viewModel.LastSelectedCellColumnIndex = idx;
 
         if (e.ContextMenuInfo is GridRecordContextMenuInfo recordInfo)
         {
@@ -76,32 +78,22 @@ public partial class MainWindow
                 item.Tag = dataObject;
             }
         }
-        //else if (e.ContextMenuInfo is Header headerInfo)
-        //{
-        //    // Access the column information
-        //    var column = headerInfo.Column;
-        //    // Similar to above, pass column info to MenuItems
-        //}
+        else
+        {
+        }
     }
 
-    //public void CellClick(object sender, RoutedEventArgs e)
-    //{
-    //    if (sender != null)
-    //    {
-    //        DataGridCell? cell = sender as DataGridCell;
-    //        if (cell != null) _viewModel.LastSelectedCellColumnIndex = cell.Column.DisplayIndex;
-    //    }
-    //}
+    private void AddHeaderContextMenuToDataGrid()
+    {
+        DicomFileCommonDataGrid.HeaderContextMenu = new ContextMenu();
 
-    //public void HeaderClick(object sender, RoutedEventArgs e)
-    //{
-    //    if (sender != null)
-    //    {
-    //        DataGridColumnHeader? header = sender as DataGridColumnHeader;
-    //        if (header != null) _viewModel.LastSelectedCellColumnIndex = header.DisplayIndex;
-    //    }
-    //}
+        // COPY TO CLIPBOARD
+        MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
+        removeColumnFromDisplayItem.Click += _viewModel.RemoveColumnFromDisplay;
+        DicomFileCommonDataGrid.HeaderContextMenu.Items.Add(removeColumnFromDisplayItem);
 
+
+    }
 
     private void OnClose(object sender, ExecutedRoutedEventArgs e)
     {
