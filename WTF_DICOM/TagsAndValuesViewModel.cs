@@ -176,7 +176,6 @@ namespace WTF_DICOM
             }
         }
 
-        [RelayCommand]
         public void ShowReferencedFiles(WTFDicomItem tag)
         {
             if (tag == null) return;
@@ -187,6 +186,17 @@ namespace WTF_DICOM
             ReferencedSOPInstanceUIDViewModel referencedSOPInstanceUIDViewModel = new ReferencedSOPInstanceUIDViewModel(referencedFiles, tag);
             ReferencedSOPInstanceUIDsWindow window = new ReferencedSOPInstanceUIDsWindow(referencedSOPInstanceUIDViewModel);
             window.Show();
+        }
+        public void ShowReferencedFiles(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+            if (menuItem != null && menuItem.Tag != null)
+            {
+                if (menuItem.Tag is WTFDicomItem)
+                {
+                    ShowReferencedFiles(menuItem.Tag as WTFDicomItem);
+                }
+            }
         }
 
         [RelayCommand]
@@ -319,7 +329,14 @@ namespace WTF_DICOM
             showSequenceItem.Click += ShowSequence;
             TagsAndValuesDataGrid.RecordContextMenu.Items.Add(showSequenceItem);
 
-
+            // SHOW REFERENCED FILES
+            MenuItem showReferencedFilesItem = new MenuItem { 
+                Header = "Show Referenced Files",
+                Name = "ShowReferencedFiles"
+            };
+            showReferencedFilesItem.Style = seqStyle;
+            showReferencedFilesItem.Click += ShowReferencedFiles;
+            TagsAndValuesDataGrid.RecordContextMenu.Items.Add(showReferencedFilesItem);
         }
 
         private void TagsAndValuesDataGrid_GridContextMenuOpening(object? sender, GridContextMenuEventArgs e)
@@ -346,7 +363,8 @@ namespace WTF_DICOM
                 foreach (MenuItem item in TagsAndValuesDataGrid.RecordContextMenu.Items)
                 {
                     item.Tag = dataObject;
-                    if (!isSequence && item.Name.Equals("ShowSequence"))
+                    if (!isSequence && 
+                        (item.Name.Equals("ShowSequence") || item.Name.Equals("ShowReferencedFiles")))
                     {
                         item.Visibility = Visibility.Collapsed;
                     }
@@ -355,7 +373,6 @@ namespace WTF_DICOM
                         item.Visibility = Visibility.Visible;
                     }
                 }
-
             }
             else
             {
