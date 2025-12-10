@@ -14,6 +14,8 @@ using FellowOakDicom;
 using Microsoft.Win32;
 
 using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.Windows.Controls.Grid;
+using Syncfusion.Windows.Tools.Controls;
 
 using WTF_DICOM.Models;
 
@@ -30,6 +32,8 @@ namespace WTF_DICOM
         public string _dicomFileName = "";
 
         public ObservableCollection<WTFDicomItem> TagsAndValuesList { get; private set; } = new();
+
+        // These properties are used when this model is being used to display info for sequences
         private List<WTFDicomDataset> SequenceEntries = new List<WTFDicomDataset>();
         private int _sequenceEntryIndex = 0;
         public int SequenceEntryIndex
@@ -53,11 +57,11 @@ namespace WTF_DICOM
         [ObservableProperty]
         public bool _isSequence = false;
 
-        public int LastSelectedCellColumnIndex { get; set; } = 0; // set in TagsAndValuesViewWindow CellClick()
+        public int LastSelectedCellColumnIndex { get; set; } = 0; // set in TagsAndValuesDataGrid_CurrentCellActivated()
         
         public DataGrid? MyDataGrid { get; set; } // Deprecated - only used for old window
 
-        public string TitleToDisplay { get; set; } = "Title";
+        public string TitleToDisplay { get; set; } = "Title"; // currently filled in with filename if this is a whole file
 
         public TagsAndValuesViewModel(MainWindowViewModel mwvm, DicomFileCommon dicomFile)
         {
@@ -81,6 +85,7 @@ namespace WTF_DICOM
             TagsAndValuesList = SequenceEntries[0].TagsAndValuesList;
             IsSequence = true;
             TitleToDisplay = seq.Tag.DictionaryEntry.Name;
+            CreateSfDataGrid();
         }
 
         public void CopyToClipboard(WTFDicomItem tag)
@@ -136,29 +141,40 @@ namespace WTF_DICOM
             }
         }
 
-        //[RelayCommand]
-        //public void ShowSequence(WTFDicomItem tag)
-        //{
-        //    if (tag == null) return;
-        //    if (!tag.IsSequence)   return;
-        //    // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
-        //    if (tag.MyDicomSequence == null) return;
+        public void ShowSequence(WTFDicomItem tag)
+        {
+            if (tag == null) return;
+            if (!tag.IsSequence) return;
+            // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
+            if (tag.MyDicomSequence == null) return;
 
-        //    List<WTFDicomDataset> sequenceEntries = new List<WTFDicomDataset>();
-        //    foreach (DicomDataset dicomDataset in tag.MyDicomSequence)
-        //    {
-        //        WTFDicomDataset dataset = new WTFDicomDataset(dicomDataset);
-        //        sequenceEntries.Add(dataset);
-        //    }
+            List<WTFDicomDataset> sequenceEntries = new List<WTFDicomDataset>();
+            foreach (DicomDataset dicomDataset in tag.MyDicomSequence)
+            {
+                WTFDicomDataset dataset = new WTFDicomDataset(dicomDataset);
+                sequenceEntries.Add(dataset);
+            }
 
-        //    TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(
-        //        _mainWindowViewModel,
-        //        sequenceEntries,
-        //        _myDicomFileCommon,
-        //        tag.MyDicomSequence);
-        //    TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
-        //    tagsAndValuesWindow.Show();
-        //}
+            TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(
+                _mainWindowViewModel,
+                sequenceEntries,
+                _myDicomFileCommon,
+                tag.MyDicomSequence);
+            TagsAndValuesContentControl sequenceCC = new TagsAndValuesContentControl(tagsAndValuesViewModel);
+            DockingManager.SetHeader(sequenceCC, tag.TagInWords);
+            _mainWindowViewModel.SequencesDockingManager.Children.Add(sequenceCC);
+        }
+        public void ShowSequence(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+            if (menuItem != null && menuItem.Tag != null)
+            {
+                if (menuItem.Tag is WTFDicomItem)
+                {
+                    ShowSequence(menuItem.Tag as WTFDicomItem);
+                }
+            }
+        }
 
         [RelayCommand]
         public void ShowReferencedFiles(WTFDicomItem tag)
@@ -227,17 +243,18 @@ namespace WTF_DICOM
             TagsAndValuesDataGrid.AllowSorting = true;
             TagsAndValuesDataGrid.AllowDeleting = false;
             TagsAndValuesDataGrid.AllowResizingColumns = true;
+            TagsAndValuesDataGrid.ColumnSizer = GridLengthUnitType.Auto;
             TagsAndValuesDataGrid.CurrentCellActivated += TagsAndValuesDataGrid_CurrentCellActivated;
 
             var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
-                HeaderText = "Dicom Tag {Group, Element}",
+                HeaderText = "{Group, Element}",
                 MappingName= "TagAsString",
                 DisplayBinding = new Binding($"TagAsString")
             };
             TagsAndValuesDataGrid.Columns.Add(column);
 
             column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
-                HeaderText = "Dicom Tag Name",
+                HeaderText = "Dicom Tag",
                 MappingName = "TagInWords",
                 DisplayBinding = new Binding($"TagInWords")
             };
@@ -285,6 +302,24 @@ namespace WTF_DICOM
             // DataContexts will be set in the following when cell/row clicked
             TagsAndValuesDataGrid.GridContextMenuOpening += TagsAndValuesDataGrid_GridContextMenuOpening;
 
+
+            // SHOW SEQUENCE
+            MenuItem showSequenceItem = new MenuItem { 
+                Header = "Show Sequence",
+                Name = "ShowSequence"
+            };
+            Setter seqSetter = new Setter()
+            {
+                Property = MenuItem.VisibilityProperty,
+                Value = Visibility.Visible,
+            };
+            Style seqStyle = new Style();
+            seqStyle.Setters.Add(seqSetter);
+            showSequenceItem.Style = seqStyle;
+            showSequenceItem.Click += ShowSequence;
+            TagsAndValuesDataGrid.RecordContextMenu.Items.Add(showSequenceItem);
+
+
         }
 
         private void TagsAndValuesDataGrid_GridContextMenuOpening(object? sender, GridContextMenuEventArgs e)
@@ -295,12 +330,32 @@ namespace WTF_DICOM
             {
                 // Access the data object of the right-clicked row
                 var dataObject = recordInfo.Record;
+
+                bool isSequence = false;
+                if (dataObject is WTFDicomItem)
+                {
+                    WTFDicomItem wtfDicomItem = dataObject as WTFDicomItem;
+                    if (wtfDicomItem != null && wtfDicomItem.IsSequence)
+                    {
+                        isSequence = true;
+                    }
+                }
+
                 // You can now access properties of dataObject and potentially set them as Tag or CommandParameter for your MenuItems
                 // Example: Pass the entire dataObject to a MenuItem's Tag
                 foreach (MenuItem item in TagsAndValuesDataGrid.RecordContextMenu.Items)
                 {
                     item.Tag = dataObject;
+                    if (!isSequence && item.Name.Equals("ShowSequence"))
+                    {
+                        item.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        item.Visibility = Visibility.Visible;
+                    }
                 }
+
             }
             else
             {

@@ -89,7 +89,7 @@
                 AutoGenerateColumns="False"
                 IsReadOnly="True"
                 SelectionMode="Single"
-                ColumnSizer="Star"
+                ColumnSizer="AutoWithLastColumnFill"
                 AllowFiltering="True"
                 AllowSorting="True"
                 AllowDeleting="True"
@@ -110,7 +110,7 @@
         syncfusion:DockingManager.DesiredWidthInDockedMode="390"
         syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
         syncfusion:DockingManager.Header="File Specific Information"
-        syncfusion:DockingManager.SideInDockedMode="Right"
+        syncfusion:DockingManager.SideInDockedMode="Tabbed"
         syncfusion:DockingManager.State="Dock"
         syncfusion:DocumentContainer.MDIBounds="2,2,390,300"
         BorderThickness="2">
@@ -118,6 +118,27 @@
         <!-- Docking Manager for TagsAndValues windows -->
         <syncfusion:DockingManager
           x:Name="RHSTagsAndValuesDockingManager"
+          DockFill="True">
+        </syncfusion:DockingManager>
+
+      </ContentControl>
+
+      <!-- TABBED DISPLAY -->
+      <ContentControl
+        x:Name="TabbedSequencesContentControl"
+        Padding="0,0,10,0"
+        syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
+        syncfusion:DockingManager.DesiredWidthInDockedMode="390"
+        syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
+        syncfusion:DockingManager.Header="Sequences"
+        syncfusion:DockingManager.SideInDockedMode="Tabbed"
+        syncfusion:DockingManager.State="Dock"
+        syncfusion:DocumentContainer.MDIBounds="2,2,390,300"
+        BorderThickness="2">
+
+        <!-- Docking Manager for TagsAndValues windows -->
+        <syncfusion:DockingManager
+          x:Name="TabbedSequencesDockingManager"
           DockFill="True">
         </syncfusion:DockingManager>
 
@@ -135,6 +156,11 @@
     <Style TargetType="syncfusion:GridHeaderCellControl">
       <Setter Property="FontSize" Value="12"/>
     </Style>
+    <DataTemplate x:Key="WTFHeaderTemplate">
+      <Grid>
+        <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+      </Grid>
+    </DataTemplate>
   </Window.Resources>
 
 </syncfusion:ChromelessWindow>

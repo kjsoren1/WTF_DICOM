@@ -28,6 +28,7 @@ public partial class MainWindow
         DataContext = _viewModel = viewModel;
         viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);
         viewModel.TagsAndValuesDockingManager = RHSTagsAndValuesDockingManager;
+        viewModel.SequencesDockingManager = TabbedSequencesDockingManager;
         AddRecordContextMenuToDataGrid();
         AddHeaderContextMenuToDataGrid();
 
