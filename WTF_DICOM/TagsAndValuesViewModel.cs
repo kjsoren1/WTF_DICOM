@@ -14,6 +14,8 @@ using FellowOakDicom;
 using Microsoft.Win32;
 
 using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.UI.Xaml.Grid.Cells;
+using Syncfusion.UI.Xaml.Grid.Helpers;
 using Syncfusion.Windows.Controls.Grid;
 using Syncfusion.Windows.Tools.Controls;
 
@@ -35,7 +37,7 @@ namespace WTF_DICOM
 
         // These properties are used when this model is being used to display info for sequences
         private List<WTFDicomDataset> SequenceEntries = new List<WTFDicomDataset>();
-        private int _sequenceEntryIndex = 0;
+        private int _sequenceEntryIndex = -1;
         public int SequenceEntryIndex
         {
             get { return _sequenceEntryIndex; }
@@ -45,9 +47,22 @@ namespace WTF_DICOM
                 value = Math.Min(value, SequenceEntries.Count-1);
                 _sequenceEntryIndex = value;
                 SequenceCounterString = "(" + (SequenceEntryIndex+1) + " of " + SequenceEntries.Count + ")";
-                TagsAndValuesList = SequenceEntries[_sequenceEntryIndex].TagsAndValuesList;
+                TagsAndValuesList.Clear();
+                foreach(var item in SequenceEntries[_sequenceEntryIndex].TagsAndValuesList)
+                {
+                    TagsAndValuesList.Add(item);
+                }
                 OnPropertyChanged(nameof(SequenceCounterString));
-                OnPropertyChanged(nameof(TagsAndValuesList));
+                //OnPropertyChanged(nameof(TagsAndValuesList));
+                //if (TagsAndValuesDataGrid != null)
+                //{
+                //    TagsAndValuesDataGrid.View.Refresh(); // CHEAT - manually update for now
+                //}
+
+                if (TagsAndValuesList.Count > 0 && TagsAndValuesDataGrid != null)
+                {
+                    TagsAndValuesDataGrid.GridColumnSizer.Refresh();
+                }
             }
         }
 
@@ -81,8 +96,7 @@ namespace WTF_DICOM
             _myParentSequence = seq;
             _mainWindowViewModel = mwvm;
             SequenceEntries = sequenceEntries;
-            SequenceEntryIndex = 0;
-            TagsAndValuesList = SequenceEntries[0].TagsAndValuesList;
+            SequenceEntryIndex = 0; // this will also initialize TagsAndValuesList
             IsSequence = true;
             TitleToDisplay = seq.Tag.DictionaryEntry.Name;
             CreateSfDataGrid();
@@ -162,6 +176,10 @@ namespace WTF_DICOM
                 tag.MyDicomSequence);
             TagsAndValuesContentControl sequenceCC = new TagsAndValuesContentControl(tagsAndValuesViewModel);
             DockingManager.SetHeader(sequenceCC, tag.TagInWords);
+
+            //tagsAndValuesViewModel.AddForwardBackwardNavigationToDataGrid();
+
+
             _mainWindowViewModel.SequencesDockingManager.Children.Add(sequenceCC);
         }
         public void ShowSequence(object sender, RoutedEventArgs e)
@@ -255,6 +273,7 @@ namespace WTF_DICOM
             TagsAndValuesDataGrid.AllowResizingColumns = true;
             TagsAndValuesDataGrid.ColumnSizer = GridLengthUnitType.Auto;
             TagsAndValuesDataGrid.CurrentCellActivated += TagsAndValuesDataGrid_CurrentCellActivated;
+            
 
             var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
                 HeaderText = "{Group, Element}",
@@ -277,14 +296,33 @@ namespace WTF_DICOM
             };
             TagsAndValuesDataGrid.Columns.Add(column);
 
-            // Add stacked header row so we can display filename at top of grid
-            StackedHeaderRow stackedHeaderRow = new StackedHeaderRow();
-            StackedColumn stackedColumn = new StackedColumn();
-            stackedColumn.HeaderText = TitleToDisplay;
-            stackedColumn.ChildColumns = "TagAsString" + "," + "TagInWords" + "," + "ValueOfTagAsString";
-            stackedHeaderRow.StackedColumns.Add(stackedColumn);
+            if (IsSequence)
+            {
+                // Add stacked header row for the forward/backward buttons
+                StackedHeaderRow fbStackedHeaderRow = new StackedHeaderRow();
+                StackedColumn fbStackedColumn = new StackedColumn();
+                fbStackedColumn.HeaderText = "Sequence";
+                fbStackedColumn.MappingName = "ForwardBackwardButtons";
+                fbStackedColumn.ChildColumns = "TagAsString" + "," + "TagInWords" + "," + "ValueOfTagAsString";
+                fbStackedHeaderRow.StackedColumns.Add(fbStackedColumn);
 
-            TagsAndValuesDataGrid.StackedHeaderRows.Add(stackedHeaderRow);
+                TagsAndValuesDataGrid.StackedHeaderRows.Add(fbStackedHeaderRow);
+
+                TagsAndValuesDataGrid.CellRenderers.Remove("StackedHeader");
+                TagsAndValuesDataGrid.CellRenderers.Add("StackedHeader", new GridStackedHeaderCellRendererExt());
+            }
+            else
+            {
+                // Add stacked header row so we can display filename at top of grid
+                StackedHeaderRow stackedHeaderRow = new StackedHeaderRow();
+                StackedColumn stackedColumn = new StackedColumn();
+                stackedColumn.HeaderText = TitleToDisplay;
+                stackedColumn.MappingName = "GridTitleToDisplay";
+                stackedColumn.ChildColumns = "TagAsString" + "," + "TagInWords" + "," + "ValueOfTagAsString";
+                stackedHeaderRow.StackedColumns.Add(stackedColumn);
+
+                TagsAndValuesDataGrid.StackedHeaderRows.Add(stackedHeaderRow);
+            }
 
             // Add context menu
             AddRecordContextMenuToDataGrid();
@@ -337,6 +375,15 @@ namespace WTF_DICOM
             showReferencedFilesItem.Style = seqStyle;
             showReferencedFilesItem.Click += ShowReferencedFiles;
             TagsAndValuesDataGrid.RecordContextMenu.Items.Add(showReferencedFilesItem);
+        }
+
+        private void AddForwardBackwardNavigationToDataGrid()
+        {
+            if (!IsSequence) { return; }
+            if (TagsAndValuesDataGrid == null) { return; }            
+
+            TagsAndValuesDataGrid.CellRenderers.Remove("StackedHeader");
+            TagsAndValuesDataGrid.CellRenderers.Add("StackedHeader", new GridStackedHeaderCellRendererExt());
         }
 
         private void TagsAndValuesDataGrid_GridContextMenuOpening(object? sender, GridContextMenuEventArgs e)

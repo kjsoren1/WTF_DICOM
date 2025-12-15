@@ -12,6 +12,11 @@ namespace WTF_DICOM;
 /// </summary>
 public partial class App : Application
 {
+    public App()
+    {
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWH1fc3VQRGFfVUZ0WUNWYEg=");
+    }
+
     [STAThread]
     private static void Main(string[] args)
     {

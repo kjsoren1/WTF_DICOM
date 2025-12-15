@@ -150,8 +150,36 @@
   <!--end layout Grid-->
 
   <Window.Resources>
-    <Style TargetType="syncfusion:GridStackedHeaderCellControl">
+    <Style x:Key="forwardBackwardButtonsStackedHeaderCell"  TargetType="syncfusion:GridStackedHeaderCellControl">
       <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="syncfusion:GridStackedHeaderCellControl">
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+              <Button Command="{Binding FirstCommand}" Content="first" />
+              <Button Command="{Binding Minus5Command}" Content="-5" />
+              <Button Command="{Binding Minus1Command}" Content="-1" />
+              <TextBlock Text="{Binding SequenceCounterString}" VerticalAlignment="Center" Margin="4,0,4,0">
+              </TextBlock>
+              <Button Command="{Binding Plus1Command}" Content="+1" />
+              <Button Command="{Binding Plus5Command}" Content="+5" />
+              <Button Command="{Binding LastCommand}" Content="last" />
+
+              <StackPanel.Style>
+                <Style TargetType="{x:Type StackPanel}">
+                  <Setter Property="Visibility" Value="Visible"/>
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSequence}" Value="False">
+                      <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </StackPanel.Style>
+
+            </StackPanel>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
     </Style>
     <Style TargetType="syncfusion:GridHeaderCellControl">
       <Setter Property="FontSize" Value="12"/>

@@ -36,5 +36,4 @@ public partial class TagsAndValuesContentControl : ContentControl
         this.Content = viewModel.TagsAndValuesDataGrid;
     }
 
-
 }
