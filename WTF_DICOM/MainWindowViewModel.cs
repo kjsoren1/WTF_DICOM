@@ -73,6 +73,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     public SfDataGrid? MyDataGrid { get; set; }
     public DockingManager? TagsAndValuesDockingManager { get; set; }
     public DockingManager? SequencesDockingManager { get; set; }
+    public DockingManager? MainDockingManager { get; set; }
 
     public MainWindowViewModel()
     {

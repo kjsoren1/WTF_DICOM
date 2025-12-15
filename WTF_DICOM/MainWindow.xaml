@@ -56,7 +56,7 @@
     <!--Content-->
 
 
-    <!-- try using a  scrollviewer around the datagrid??? -->
+    <!-- Outermost Docking Manager -->
     <syncfusion:DockingManager
       Grid.Column="1" Grid.Row="2"
       x:Name="MainWindowContentDockingManager"
@@ -74,12 +74,13 @@
       <ContentControl
           x:Name="DicomFilesContentControl"
           syncfusion:DockingManager.Header="Dicom Files"
+          syncfusion:DockingManager.DesiredHeightInDockedMode="200"
           syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
           syncfusion:DockingManager.DesiredWidthInDockedMode="800"
           syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
-          syncfusion:DockingManager.SideInDockedMode="Left"
           syncfusion:DockingManager.State="Dock"
-          syncfusion:DocumentContainer.MDIBounds="2,2,800,300"
+          syncfusion:DockingManager.SideInDockedMode="Bottom"
+          syncfusion:DocumentContainer.MDIBounds="2,2,1200,200"
           BorderThickness="0">
 
         <syncfusion:SfDataGrid
@@ -97,30 +98,7 @@
                 AllowGrouping="True"
                 AllowResizingColumns="True"
                 AlternationCount="2">
-
         </syncfusion:SfDataGrid>
-
-      </ContentControl>
-
-      <!-- RHS DISPLAY -->
-      <ContentControl
-        x:Name="RHSTagsAndValuesContentControl"
-        Padding="0,0,10,0"
-        syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
-        syncfusion:DockingManager.DesiredWidthInDockedMode="390"
-        syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
-        syncfusion:DockingManager.Header="File Specific Information"
-        syncfusion:DockingManager.SideInDockedMode="Tabbed"
-        syncfusion:DockingManager.State="Dock"
-        syncfusion:DocumentContainer.MDIBounds="2,2,390,300"
-        BorderThickness="2">
-        
-        <!-- Docking Manager for TagsAndValues windows -->
-        <syncfusion:DockingManager
-          x:Name="RHSTagsAndValuesDockingManager"
-          DockFill="True">
-        </syncfusion:DockingManager>
-
       </ContentControl>
 
       <!-- TABBED DISPLAY -->
@@ -131,8 +109,8 @@
         syncfusion:DockingManager.DesiredWidthInDockedMode="390"
         syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
         syncfusion:DockingManager.Header="Sequences"
-        syncfusion:DockingManager.SideInDockedMode="Tabbed"
-        syncfusion:DockingManager.State="Dock"
+        syncfusion:DockingManager.SideInDockedMode="Right"
+        syncfusion:DockingManager.State="Document"
         syncfusion:DocumentContainer.MDIBounds="2,2,390,300"
         BorderThickness="2">
 
@@ -143,6 +121,29 @@
         </syncfusion:DockingManager>
 
       </ContentControl>
+
+      <!-- RHS DISPLAY -->
+      <ContentControl
+        x:Name="TagsAndValuesContentControl"
+        Padding="0,0,10,0"
+        syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
+        syncfusion:DockingManager.DesiredWidthInDockedMode="390"
+        syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
+        syncfusion:DockingManager.Header="File Specific Information"
+        syncfusion:DockingManager.SideInDockedMode="Tabbed"
+        syncfusion:DockingManager.State="Document"
+        syncfusion:DocumentContainer.MDIBounds="2,2,390,300"
+        BorderThickness="2">
+        
+        <!-- Docking Manager for TagsAndValues windows -->
+        <syncfusion:DockingManager
+          x:Name="TagsAndValuesDockingManager"
+          DockFill="True">
+        </syncfusion:DockingManager>
+
+      </ContentControl>
+
+
 
 
     </syncfusion:DockingManager>

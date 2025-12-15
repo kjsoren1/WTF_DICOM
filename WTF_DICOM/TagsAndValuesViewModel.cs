@@ -179,8 +179,8 @@ namespace WTF_DICOM
 
             //tagsAndValuesViewModel.AddForwardBackwardNavigationToDataGrid();
 
-
             _mainWindowViewModel.SequencesDockingManager.Children.Add(sequenceCC);
+            _mainWindowViewModel.MainDockingManager.ActivateWindow("TabbedSequencesContentControl");
         }
         public void ShowSequence(object sender, RoutedEventArgs e)
         {

@@ -28,11 +28,14 @@ public partial class MainWindow
 
         DataContext = _viewModel = viewModel;
         viewModel.SetDataGridAndColumns(DicomFileCommonDataGrid);
-        viewModel.TagsAndValuesDockingManager = RHSTagsAndValuesDockingManager;
+        viewModel.TagsAndValuesDockingManager = TagsAndValuesDockingManager;
         viewModel.SequencesDockingManager = TabbedSequencesDockingManager;
+        viewModel.MainDockingManager = MainWindowContentDockingManager;
         AddRecordContextMenuToDataGrid();
         AddHeaderContextMenuToDataGrid();
 
+        TagsAndValuesDockingManager.ActivateWindow("TagsAndValuesContentControl");
+        TagsAndValuesDockingManager.ActivateWindow("DicomFilesContentControl");
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnClose));
     }
 
