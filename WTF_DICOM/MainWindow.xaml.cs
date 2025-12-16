@@ -63,6 +63,11 @@ public partial class MainWindow
         selectAllReferencedFilesItem.Click += _viewModel.SelectAllReferencedFiles;
         DicomFileCommonDataGrid.RecordContextMenu.Items.Add(selectAllReferencedFilesItem);
 
+        // SHOW ALL REFERENCED FILES
+        MenuItem showAllReferencedFilesItem = new MenuItem { Header = "Show All Referenced Files" };
+        showAllReferencedFilesItem.Click += _viewModel.ShowAllReferencedFiles;
+        DicomFileCommonDataGrid.RecordContextMenu.Items.Add(showAllReferencedFilesItem);
+
         // DataContexts will be set in the following when cell/row clicked
         DicomFileCommonDataGrid.GridContextMenuOpening += DicomFileCommonDataGrid_GridContextMenuOpening;
     }

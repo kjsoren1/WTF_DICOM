@@ -133,6 +133,7 @@ namespace WTF_DICOM.Helpers
             return references;
         }
 
+        // NOTE - returned result may contain duplicates
         public static void GetAllReferencedSOPInstanceUID(DicomDataset dicomDataset, List<DicomItem> referencedSOPInstanceUIDItems)
         {
             if (dicomDataset == null) return;
@@ -172,13 +173,15 @@ namespace WTF_DICOM.Helpers
             if (dicomFileCommon == null) return new ObservableCollection<ReferencedSOPInstanceUIDInfo>();
 
             List<DicomItem> referenceDicomItems = GetAllReferencedSOPInstanceUID(dicomFileCommon);
+
             return GetReferencedSOPInstanceUIDs(referenceDicomItems, dicomFiles);
         }
 
 
         public static ObservableCollection<ReferencedSOPInstanceUIDInfo> GetReferencedSOPInstanceUIDs(List<DicomItem> referenceDicomItems, ObservableCollection<DicomFileCommon> dicomFiles)
-        {               
-            ObservableCollection<ReferencedSOPInstanceUIDInfo> referencedFiles = new ObservableCollection<ReferencedSOPInstanceUIDInfo>();
+        {     
+            List<ReferencedSOPInstanceUIDInfo> referencedFilesList = new List<ReferencedSOPInstanceUIDInfo>();
+            
             foreach (DicomItem item in referenceDicomItems)
             {
                 string referencedSOPInstanceUID = "";
@@ -195,7 +198,7 @@ namespace WTF_DICOM.Helpers
                     {
                         ReferencedSOPInstanceUIDInfo referencedFile =
                             new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, dicomFileCommon.DicomFileName, dicomFileCommon.Modality);
-                        referencedFiles.Add(referencedFile);
+                        referencedFilesList.Add(referencedFile);
                         found = true;
                         break;
                     }
@@ -205,7 +208,7 @@ namespace WTF_DICOM.Helpers
                         {
                             ReferencedSOPInstanceUIDInfo referencedFile =
                                 new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, relatedFile.DicomFileName, relatedFile.Modality);
-                            referencedFiles.Add(referencedFile);
+                            referencedFilesList.Add(referencedFile);
                             found = true;
                             break;
                         }
@@ -214,10 +217,13 @@ namespace WTF_DICOM.Helpers
                 if (!found)
                 {
                     ReferencedSOPInstanceUIDInfo referencedFile =
-                        new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, "no file found", "unknown");
-                    referencedFiles.Add(referencedFile);
+                        new ReferencedSOPInstanceUIDInfo(referencedSOPInstanceUID, "no file found with this UID", "");
+                    referencedFilesList.Add(referencedFile);
                 }
             }
+
+            ObservableCollection<ReferencedSOPInstanceUIDInfo> referencedFiles =
+                new ObservableCollection<ReferencedSOPInstanceUIDInfo>(referencedFilesList.DistinctBy(f=>f.ReferencedSOPInstanceUID).ToList());
             return referencedFiles;
         }
 
@@ -296,52 +302,52 @@ namespace WTF_DICOM.Helpers
         public static string GetDisplayValueForSequence(DicomSequence seq, DicomTag dicomTag)
         {
             string value = "";
-            string tagName = "";
-            string nameInsideItem = "";
+            //string tagName = "";
+            //string nameInsideItem = "";
 
-            if (dicomTag.Equals(DicomTag.BeamSequence))
-            {
-                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.BeamName);
-            }
-            else if (dicomTag.Equals(DicomTag.DoseReferenceSequence))
-            {
-                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.DoseReferenceDescription);
-            }
-            else if (dicomTag.Equals(DicomTag.StructureSetROISequence))
-            {
-                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ROIName);
-            }
-            else if (dicomTag.Equals(DicomTag.ReferencedDoseSequence))
-            {
-                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ReferencedSOPInstanceUID);
-            }
-            else if (dicomTag.Equals(DicomTag.ReferencedStructureSetSequence))
-            {
-                nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ReferencedSOPInstanceUID);
-            }
-            else
-            {
-                DicomDataset dicomDataset = seq.ElementAt(0);
-                foreach (DicomItem dicomItem in dicomDataset)
-                {
-                    tagName = dicomItem.Tag.DictionaryEntry.Name;
-                    StringComparison comparison = StringComparison.OrdinalIgnoreCase;
-                    if (tagName.Contains("Name", comparison))
-                    {
-                        string tempName = dicomDataset.GetString(dicomItem.Tag);
-                        if (!tempName.Equals("")) nameInsideItem = tempName;
-                    }
-                }
-            }
+            //if (dicomTag.Equals(DicomTag.BeamSequence))
+            //{
+            //    nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.BeamName);
+            //}
+            //else if (dicomTag.Equals(DicomTag.DoseReferenceSequence))
+            //{
+            //    nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.DoseReferenceDescription);
+            //}
+            //else if (dicomTag.Equals(DicomTag.StructureSetROISequence))
+            //{
+            //    nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ROIName);
+            //}
+            //else if (dicomTag.Equals(DicomTag.ReferencedDoseSequence))
+            //{
+            //    nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ReferencedSOPInstanceUID);
+            //}
+            //else if (dicomTag.Equals(DicomTag.ReferencedStructureSetSequence))
+            //{
+            //    nameInsideItem = Helpers.TagWrangling.SequenceRepresentativeString(seq, DicomTag.ReferencedSOPInstanceUID);
+            //}
+            //else
+            //{
+            //    DicomDataset dicomDataset = seq.ElementAt(0);
+            //    foreach (DicomItem dicomItem in dicomDataset)
+            //    {
+            //        tagName = dicomItem.Tag.DictionaryEntry.Name;
+            //        StringComparison comparison = StringComparison.OrdinalIgnoreCase;
+            //        if (tagName.Contains("Name", comparison))
+            //        {
+            //            string tempName = dicomDataset.GetString(dicomItem.Tag);
+            //            if (!tempName.Equals("")) nameInsideItem = tempName;
+            //        }
+            //    }
+            //}
 
 
             if (Helpers.TagWrangling.IsReferencedSequence(dicomTag))
             {
-                value = "Referenced Sequence of " + seq.Count() + " items: " + nameInsideItem;
+                value = "Referenced Sequence of " + seq.Count() + " items";
             }
             else
             {
-                value = "Sequence of " + seq.Count() + " items: " + nameInsideItem;
+                value = "Sequence of " + seq.Count() + " items";
             }
             return value;
         }

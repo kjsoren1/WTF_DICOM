@@ -307,6 +307,26 @@ public partial class MainWindowViewModel : ObservableRecipient
         }
     }
 
+    public void ShowAllReferencedFiles(object sender, RoutedEventArgs e)
+    {
+        MenuItem menuItem = sender as MenuItem;
+        if (menuItem != null && menuItem.Tag != null)
+        {
+            if (menuItem.Tag is DicomFileCommon)
+            {
+                DicomFileCommon dfc = (DicomFileCommon)menuItem.Tag;
+                ObservableCollection<ReferencedSOPInstanceUIDInfo> referencedFiles =
+                    Helpers.TagWrangling.GetReferencedSOPInstanceUIDs(dfc, DicomFiles);
+
+                ReferencedSOPInstanceUIDViewModel referencedSOPInstanceUIDViewModel =
+                    new ReferencedSOPInstanceUIDViewModel(referencedFiles, dfc.DicomFileName);
+                ReferencedSOPInstanceUIDsWindow window =
+                    new ReferencedSOPInstanceUIDsWindow(referencedSOPInstanceUIDViewModel);
+                window.Show();
+            }
+        }
+    }
+
     public void RemoveColumnFromDisplay(object sender, RoutedEventArgs e)
     {
         RemoveColumnFromDisplayHelper(LastSelectedCellColumnIndex);

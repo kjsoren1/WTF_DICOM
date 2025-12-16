@@ -29,7 +29,7 @@ public partial class ReferencedSOPInstanceUIDsWindow : ChromelessWindow
         DataContext = _viewModel = viewModel;
         viewModel.MyDataGrid = ReferencedSOPInstanceUIDsDataGrid;
 
-        this.Title = viewModel.TagOfOrigin.TagInWords;
+        this.Title = viewModel.TitleToDisplay;
     }
 
     public void DataGridContextMenuOpeningHandler(object sender, ContextMenuEventArgs e)
