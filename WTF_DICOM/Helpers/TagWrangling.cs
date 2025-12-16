@@ -221,53 +221,54 @@ namespace WTF_DICOM.Helpers
             return referencedFiles;
         }
 
+        //// Deprecated
+        //public static int SelectReferencedSOPInstanceUIDs(DicomFileCommon dicomFileCommon, ObservableCollection<DicomFileCommon> dicomFiles)
+        //{
+        //    if (dicomFileCommon == null) return -1;
 
-        public static int SelectReferencedSOPInstanceUIDs(DicomFileCommon dicomFileCommon, ObservableCollection<DicomFileCommon> dicomFiles)
-        {
-            if (dicomFileCommon == null) return -1;
+        //    List<DicomItem> referenceDicomItems = GetAllReferencedSOPInstanceUID(dicomFileCommon);
+        //    return SelectReferencedSOPInstanceUIDs(referenceDicomItems, dicomFiles);
+        //}
 
-            List<DicomItem> referenceDicomItems = GetAllReferencedSOPInstanceUID(dicomFileCommon);
-            return SelectReferencedSOPInstanceUIDs(referenceDicomItems, dicomFiles);
-        }
+        //// Deprecated
+        //public static int SelectReferencedSOPInstanceUIDs(List<DicomItem> referenceDicomItems, ObservableCollection<DicomFileCommon> dicomFiles)
+        //{      
+        //    int nReferencedAndNotFound = 0;
+        //    foreach (DicomItem item in referenceDicomItems)
+        //    {
+        //        string referencedSOPInstanceUID = "";
+        //        if (item is DicomElement element)
+        //        {
+        //            referencedSOPInstanceUID = element.Get<string>();
+        //        }
 
-        public static int SelectReferencedSOPInstanceUIDs(List<DicomItem> referenceDicomItems, ObservableCollection<DicomFileCommon> dicomFiles)
-        {      
-            int nReferencedAndNotFound = 0;
-            foreach (DicomItem item in referenceDicomItems)
-            {
-                string referencedSOPInstanceUID = "";
-                if (item is DicomElement element)
-                {
-                    referencedSOPInstanceUID = element.Get<string>();
-                }
-
-                bool found = false;
-                // try to find file in our list of known files
-                foreach (DicomFileCommon dicomFileCommon in dicomFiles)
-                {
-                    if (referencedSOPInstanceUID.Equals(dicomFileCommon.SOPInstanceUID))
-                    {
-                        dicomFileCommon.Selected = true;
-                        found = true;
-                        break;
-                    }
-                    foreach (DicomFileCommon relatedFile in dicomFileCommon.RelatedDicomFiles)
-                    {
-                        if (referencedSOPInstanceUID.Equals(relatedFile.SOPInstanceUID))
-                        {
-                            relatedFile.Selected = true;
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                if (!found)
-                {
-                    nReferencedAndNotFound++;
-                }
-            }
-            return nReferencedAndNotFound;
-        }
+        //        bool found = false;
+        //        // try to find file in our list of known files
+        //        foreach (DicomFileCommon dicomFileCommon in dicomFiles)
+        //        {
+        //            if (referencedSOPInstanceUID.Equals(dicomFileCommon.SOPInstanceUID))
+        //            {
+        //                dicomFileCommon.Selected = true;
+        //                found = true;
+        //                break;
+        //            }
+        //            foreach (DicomFileCommon relatedFile in dicomFileCommon.RelatedDicomFiles)
+        //            {
+        //                if (referencedSOPInstanceUID.Equals(relatedFile.SOPInstanceUID))
+        //                {
+        //                    relatedFile.Selected = true;
+        //                    found = true;
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //        if (!found)
+        //        {
+        //            nReferencedAndNotFound++;
+        //        }
+        //    }
+        //    return nReferencedAndNotFound;
+        //}
 
         public static string SequenceRepresentativeString(DicomSequence seq, DicomTag dicomTag)
         {

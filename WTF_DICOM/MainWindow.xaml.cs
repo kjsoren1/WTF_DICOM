@@ -96,8 +96,6 @@ public partial class MainWindow
         MenuItem removeColumnFromDisplayItem = new MenuItem { Header = "Remove Column From Display" };
         removeColumnFromDisplayItem.Click += _viewModel.RemoveColumnFromDisplay;
         DicomFileCommonDataGrid.HeaderContextMenu.Items.Add(removeColumnFromDisplayItem);
-
-
     }
 
     private void OnClose(object sender, ExecutedRoutedEventArgs e)

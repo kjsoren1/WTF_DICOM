@@ -133,21 +133,17 @@ public partial class MainWindowViewModel : ObservableRecipient
     [RelayCommand]
     private void ShowAllSelectedInFolder()
     {
+        if (MyDataGrid == null) { return; }
+
         List<string> filesToShow = new List<string>();
-        foreach(DicomFileCommon dfc in DicomFiles)
+  
+        var selectedItems = MyDataGrid.SelectedItems;
+        foreach (var item in selectedItems)
         {
-            if (dfc.Selected)
-            {
-                filesToShow.Add($"{dfc.DicomFileName}");
-                if (dfc.NumberRelatedFiles > 0)
-                {
-                    foreach (DicomFileCommon rdfc in dfc.RelatedDicomFiles)
-                    {
-                        filesToShow.Add($"{rdfc.DicomFileName}");
-                    }
-                }
-            }
+            DicomFileCommon dfcItem = item as DicomFileCommon;
+            filesToShow.Add($"{dfcItem.DicomFileName}");
         }
+
         Helpers.ShowSelectedInExplorer.FilesOrFolders(filesToShow.ToArray());
     }
 
@@ -195,15 +191,15 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     public void ShowAllTags(DicomFileCommon dicomFileCommon)
     {
-        //// make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
-        //dicomFileCommon.ReadAllTags();
-        //TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dicomFileCommon);
+        //// make a pop-up window and bind to dfc.TagsAndValuesList
+        //dfc.ReadAllTags();
+        //TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dfc);
 
         //TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
         //tagsAndValuesWindow.Show();
 
         if (TagsAndValuesDockingManager == null) return;
-        // make a pop-up window and bind to dicomFileCommon.TagsAndValuesList
+        // make a pop-up window and bind to dfc.TagsAndValuesList
         try
         {
             dicomFileCommon.ReadAllTags();
@@ -271,8 +267,30 @@ public partial class MainWindowViewModel : ObservableRecipient
     public void SelectAllReferencedFiles(DicomFileCommon dicomFileCommon)
     {
         if (dicomFileCommon == null) return;
-        int nRefererencedNotFound = 
-                Helpers.TagWrangling.SelectReferencedSOPInstanceUIDs(dicomFileCommon, DicomFiles);
+
+        List<DicomItem> referenceDicomItems = Helpers.TagWrangling.GetAllReferencedSOPInstanceUID(dicomFileCommon);
+        foreach (DicomItem item in referenceDicomItems)
+        {
+            string referencedSOPInstanceUID = "";
+            if (item is DicomElement element)
+            {
+                referencedSOPInstanceUID = element.Get<string>();
+            }
+
+            bool found = false;
+            // try to find file in our list of known files
+            foreach (DicomFileCommon dfc in DicomFiles)
+            {
+                if (referencedSOPInstanceUID.Equals(dfc.SOPInstanceUID))
+                {
+                    MyDataGrid.SelectedItems.Add(dfc);
+                    //dfc.Selected = true;
+                    found = true;
+                    break;
+                }
+            }
+        }
+
 
         // TODO - make sure references of the related files also get selected
     }
@@ -309,12 +327,6 @@ public partial class MainWindowViewModel : ObservableRecipient
     }
 
     #endregion
-
-    [RelayCommand]
-    private void PlaceHolder()
-    {
-
-    }
 
 
 
@@ -383,11 +395,11 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         existingFile = FindSeriesWSameModalityInList(fileToAdd);
 
-        if (existingFile != null)
-        {
-            existingFile.RelatedDicomFiles.Add(fileToAdd);
-        }
-        else
+        //if (existingFile != null)
+        //{
+        //    existingFile.RelatedDicomFiles.Add(fileToAdd);
+        //}
+        //else
         {
             fileToAdd.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
             fileToAdd.TagColumnsToDisplay = TagColumnsToDisplay;
@@ -402,7 +414,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     {
         MyDataGrid = dataGrid;
         MyDataGrid.Columns.Clear();
-        MyDataGrid.SelectionUnit=GridSelectionUnit.Cell;
+        MyDataGrid.SelectionUnit=GridSelectionUnit.Row;
         MyDataGrid.GridColumnSizer.AutoFitMode = AutoFitMode.SmartFit;
         foreach (var dcmFile in DicomFiles)
         {
@@ -443,38 +455,50 @@ public partial class MainWindowViewModel : ObservableRecipient
         DynamicColumns.Clear();
 
         int idx = 0;
-        foreach (var item in NonTagColumnsToDisplay)
-        {
-            if (item == NonTagColumnTypes.SELECT)
-            {
-                string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.SELECT, "Select");
-                var column = new Syncfusion.UI.Xaml.Grid.GridCheckBoxColumn() {
-                    HeaderText = headerString,
-                    IsReadOnly = false
-                };
+        //foreach (var item in NonTagColumnsToDisplay)
+        //{
+        //    if (item == NonTagColumnTypes.SELECT)
+        //    {
+        //        string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.SELECT, "Select");
+        //        var column = new Syncfusion.UI.Xaml.Grid.GridCheckBoxColumn() {
+        //            HeaderText = headerString,
+        //            MappingName="Selected",
+        //            IsReadOnly = false
+        //        };
                
-                Binding cbBinding = new Binding($"Selected");
-                cbBinding.Mode = BindingMode.TwoWay;
-                cbBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-                column.DisplayBinding = cbBinding;
-                MyDataGrid.Columns.Add(column);
-                DynamicColumns.Add(headerString, column);
-                ++idx;
-            }
+        //        //Binding cbBinding = new Binding($"Selected");
+        //        //cbBinding.Mode = BindingMode.TwoWay;
+        //        //cbBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+        //        //column.DisplayBinding = cbBinding;
+        //        MyDataGrid.Columns.Add(column);
+        //        DynamicColumns.Add(headerString, column);
+        //        ++idx;
+        //    }
 
-            if (item == NonTagColumnTypes.COUNT)
-            {
-                string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.COUNT, "Count");
-                var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
-                    HeaderText = headerString,
-                    DisplayBinding = new Binding($"ItemsToDisplay[1].Count")
-                };
+        //    if (item == NonTagColumnTypes.COUNT)
+        //    {
+        //        string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.COUNT, "Count");
+        //        var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
+        //            HeaderText = headerString,
+        //            DisplayBinding = new Binding($"ItemsToDisplay[1].Count")
+        //        };
 
-                MyDataGrid.Columns.Add(column);
-                DynamicColumns.Add(headerString, column);
-                ++idx;
-            }
-        }
+        //        MyDataGrid.Columns.Add(column);
+        //        DynamicColumns.Add(headerString, column);
+        //        ++idx;
+        //    }
+        //}
+
+        string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.SELECT, "Select");
+        var selectColumn = new Syncfusion.UI.Xaml.Grid.GridCheckBoxSelectorColumn()
+        {
+            HeaderText = headerString,
+            MappingName = "SelectorColumn"
+        };
+        MyDataGrid.Columns.Add(selectColumn);
+        DynamicColumns.Add(headerString, selectColumn);
+        ++idx;
+
 
         foreach (var colTag in TagColumnsToDisplay)
         {
@@ -500,14 +524,15 @@ public partial class MainWindowViewModel : ObservableRecipient
     {
         TagColumnsToDisplay.Clear();
         TagColumnsToDisplay.Add(DicomTag.Modality);
+        TagColumnsToDisplay.Add(DicomTag.SeriesInstanceUID);
         TagColumnsToDisplay.Add(DicomTag.SOPInstanceUID);
         TagColumnsToDisplay.Add(DicomTag.PatientID);
         TagColumnsToDisplay.Add(DicomTag.PatientName);
-        TagColumnsToDisplay.Add(DicomTag.RTPlanLabel);
+        //TagColumnsToDisplay.Add(DicomTag.RTPlanLabel);
 
         NonTagColumnsToDisplay.Clear();
         NonTagColumnsToDisplay.Add(NonTagColumnTypes.SELECT);
-        NonTagColumnsToDisplay.Add(NonTagColumnTypes.COUNT);
+        //NonTagColumnsToDisplay.Add(NonTagColumnTypes.COUNT);
     }
 
     public void AddColumnToDisplay(DicomTag tag)
@@ -560,6 +585,6 @@ public partial class MainWindowViewModel : ObservableRecipient
         UpdateDataGridColumns();
     }
 
-    #endregion
+    #endregion HELPER_FUNCTIONS
 
 }

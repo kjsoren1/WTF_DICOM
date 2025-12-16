@@ -89,13 +89,14 @@
                 CurrentCellActivated="DicomFileCommonDataGrid_CurrentCellActivated"
                 AutoGenerateColumns="False"
                 IsReadOnly="True"
-                SelectionMode="Single"
+                SelectionMode="Multiple"
                 ColumnSizer="AutoWithLastColumnFill"
                 AllowFiltering="True"
                 AllowSorting="True"
                 AllowDeleting="True"
                 AllowDraggingColumns="False"
                 AllowGrouping="True"
+                ShowGroupDropArea="True"
                 AllowResizingColumns="True"
                 AlternationCount="2">
         </syncfusion:SfDataGrid>
