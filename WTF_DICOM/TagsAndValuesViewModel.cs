@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media.Media3D;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -100,6 +101,10 @@ namespace WTF_DICOM
             IsSequence = true;
             TitleToDisplay = seq.Tag.DictionaryEntry.Name;
             CreateSfDataGrid();
+            if (TagsAndValuesDataGrid != null)
+            {
+                TagsAndValuesDataGrid.QueryRowHeight += TagsAndValuesDataGrid_QueryRowHeight;
+            }
         }
 
         public void CopyToClipboard(WTFDicomItem tag)
@@ -272,6 +277,7 @@ namespace WTF_DICOM
             TagsAndValuesDataGrid.AllowDeleting = false;
             TagsAndValuesDataGrid.AllowResizingColumns = true;
             TagsAndValuesDataGrid.ColumnSizer = GridLengthUnitType.Auto;
+            TagsAndValuesDataGrid.GridLinesVisibility = GridLinesVisibility.Both; 
             TagsAndValuesDataGrid.CurrentCellActivated += TagsAndValuesDataGrid_CurrentCellActivated;
             
 
@@ -424,6 +430,27 @@ namespace WTF_DICOM
             else
             {
                 // ???
+            }
+        }
+
+        private void TagsAndValuesDataGrid_QueryRowHeight(object? sender, QueryRowHeightEventArgs e)
+        {
+            if (TagsAndValuesDataGrid == null) { return; }
+
+            //if (e.RowIndex < TagsAndValuesDataGrid.StackedHeaderRows.Count)
+            if (e.RowIndex < 1)
+            {
+                double Height;
+                GridRowSizingOptions gridRowSizingOptions = new GridRowSizingOptions();
+                gridRowSizingOptions.AutoFitMode = AutoFitMode.SmartFit;
+                if (TagsAndValuesDataGrid.GridColumnSizer.GetAutoRowHeight(e.RowIndex, gridRowSizingOptions, out Height))
+                {
+                    if (Height+8 > TagsAndValuesDataGrid.RowHeight)
+                    {
+                        e.Height = Height+8;
+                        e.Handled = true;
+                    }
+                }
             }
         }
 

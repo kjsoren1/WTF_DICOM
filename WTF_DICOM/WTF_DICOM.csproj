@@ -32,7 +32,31 @@
 
   <ItemGroup>
     <ApplicationDefinition Remove="App.xaml" />
+    <None Remove="Resources\Decrement.png" />
+    <None Remove="Resources\FFwd.png" />
+    <None Remove="Resources\First.png" />
+    <None Remove="Resources\FRwd.png" />
+    <None Remove="Resources\Increment.png" />
+    <None Remove="Resources\Last.png" />
     <Content Include="Resources\AppIcon.ico" />
+    <Content Include="Resources\Decrement.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\FFwd.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\First.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\FRwd.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Increment.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Last.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Page Include="App.xaml" />
   </ItemGroup>
 

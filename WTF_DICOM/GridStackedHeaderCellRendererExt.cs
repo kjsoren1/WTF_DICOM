@@ -7,6 +7,7 @@ using System.Windows;
 
 using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.UI.Xaml.Grid.Cells;
+using Syncfusion.Windows.Controls.Grid;
 
 using WTF_DICOM;
 
@@ -20,8 +21,7 @@ public class GridStackedHeaderCellRendererExt : GridStackedHeaderCellRenderer
         var column = (dataContext as StackedColumn);
         if (column == null ) return;
 
-        // Apply the custom style for all the StackedHeaders
-        // Apply the custom style for Order Details StackedHeader
+        // Apply the custom style for ForwardBackwardButtons StackedHeader
         if (column.MappingName.Equals("ForwardBackwardButtons"))
         {
             var style = App.Current.MainWindow.Resources["forwardBackwardButtonsStackedHeaderCell"] as Style;

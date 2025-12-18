@@ -144,32 +144,33 @@
 
       </ContentControl>
 
-
-
-
     </syncfusion:DockingManager>
   </Grid>
   <!--end layout Grid-->
 
+  
   <Window.Resources>
     <Style x:Key="forwardBackwardButtonsStackedHeaderCell"  TargetType="syncfusion:GridStackedHeaderCellControl">
-      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontSize" Value="16"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="CornflowerBlue"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="syncfusion:GridStackedHeaderCellControl">
             <StackPanel Grid.Row="2" Orientation="Horizontal">
-              <Button Command="{Binding FirstCommand}" Content="first" />
-              <Button Command="{Binding Minus5Command}" Content="-5" />
-              <Button Command="{Binding Minus1Command}" Content="-1" />
+              <syncfusion:ButtonAdv Command="{Binding FirstCommand}" Label="" SmallIcon="/Resources/First.png"  Margin="1,2,1,2" Padding="1,3,1,3"/>
+              <syncfusion:ButtonAdv Command="{Binding Minus5Command}" Label="" SmallIcon="/Resources/FRwd.png" Margin="1,2,1,2" Padding="1,3,1,3"/>
+              <syncfusion:ButtonAdv Command="{Binding Minus1Command}" Label="" SmallIcon="/Resources/Decrement.png" Margin="1,2,1,2" Padding="1,3,1,3"/>
               <TextBlock Text="{Binding SequenceCounterString}" VerticalAlignment="Center" Margin="4,0,4,0">
               </TextBlock>
-              <Button Command="{Binding Plus1Command}" Content="+1" />
-              <Button Command="{Binding Plus5Command}" Content="+5" />
-              <Button Command="{Binding LastCommand}" Content="last" />
+              <syncfusion:ButtonAdv Command="{Binding Plus1Command}" Label="" SmallIcon="/Resources/Increment.png" Margin="1,2,1,2" Padding="1,3,1,3"/>
+              <syncfusion:ButtonAdv Command="{Binding Plus5Command}" Label="" SmallIcon="/Resources/FFwd.png" Margin="1,2,1,2" Padding="1,3,1,3"/>
+              <syncfusion:ButtonAdv Command="{Binding LastCommand}" Label="" SmallIcon="/Resources/Last.png" Margin="1,2,1,2" Padding="1,3,1,3"/>
 
               <StackPanel.Style>
                 <Style TargetType="{x:Type StackPanel}">
                   <Setter Property="Visibility" Value="Visible"/>
+                  <Setter Property="Margin" Value="2"/>
                   <Style.Triggers>
                     <DataTrigger Binding="{Binding IsSequence}" Value="False">
                       <Setter Property="Visibility" Value="Collapsed"/>
