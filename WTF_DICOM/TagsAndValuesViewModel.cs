@@ -94,6 +94,7 @@ namespace WTF_DICOM
                                       DicomFileCommon dicomFile, DicomSequence seq)
         {
             _myDicomFileCommon = dicomFile;
+            _dicomFileName = dicomFile.DicomFileName;
             _myParentSequence = seq;
             _mainWindowViewModel = mwvm;
             SequenceEntries = sequenceEntries;
@@ -101,8 +102,11 @@ namespace WTF_DICOM
             IsSequence = true;
             TitleToDisplay = seq.Tag.DictionaryEntry.Name;
             CreateSfDataGrid();
+            
             if (TagsAndValuesDataGrid != null)
             {
+                //TagsAndValuesDataGrid.HeaderStyle =
+                //    App.Current.MainWindow.Resources["forwardBackwardButtonsStackedHeaderCell"] as Style;
                 TagsAndValuesDataGrid.QueryRowHeight += TagsAndValuesDataGrid_QueryRowHeight;
             }
         }
@@ -207,8 +211,11 @@ namespace WTF_DICOM
                 Helpers.TagWrangling.GetReferencedSOPInstanceUIDs(tag, _mainWindowViewModel.DicomFiles);
 
             ReferencedSOPInstanceUIDViewModel referencedSOPInstanceUIDViewModel = new ReferencedSOPInstanceUIDViewModel(referencedFiles, tag);
-            ReferencedSOPInstanceUIDsWindow window = new ReferencedSOPInstanceUIDsWindow(referencedSOPInstanceUIDViewModel);
-            window.Show();
+            ReferencedFilesContentControl referencedFilesCC = new ReferencedFilesContentControl(referencedSOPInstanceUIDViewModel);
+            DockingManager.SetHeader(referencedFilesCC, tag.TagInWords);
+
+            _mainWindowViewModel.ReferencedFilesDockingManager.Children.Add(referencedFilesCC);
+            _mainWindowViewModel.MainDockingManager.ActivateWindow("ReferencedFilesContentControl");
         }
         public void ShowReferencedFiles(object sender, RoutedEventArgs e)
         {
@@ -307,7 +314,7 @@ namespace WTF_DICOM
                 // Add stacked header row for the forward/backward buttons
                 StackedHeaderRow fbStackedHeaderRow = new StackedHeaderRow();
                 StackedColumn fbStackedColumn = new StackedColumn();
-                fbStackedColumn.HeaderText = "Sequence";
+                fbStackedColumn.HeaderText = TitleToDisplay;
                 fbStackedColumn.MappingName = "ForwardBackwardButtons";
                 fbStackedColumn.ChildColumns = "TagAsString" + "," + "TagInWords" + "," + "ValueOfTagAsString";
                 fbStackedHeaderRow.StackedColumns.Add(fbStackedColumn);
@@ -316,6 +323,17 @@ namespace WTF_DICOM
 
                 TagsAndValuesDataGrid.CellRenderers.Remove("StackedHeader");
                 TagsAndValuesDataGrid.CellRenderers.Add("StackedHeader", new GridStackedHeaderCellRendererExt());
+
+
+                //// Add stacked header row so we can display filename at top of grid
+                //StackedHeaderRow stackedHeaderRow = new StackedHeaderRow();
+                //StackedColumn stackedColumn = new StackedColumn();
+                //stackedColumn.HeaderText = TitleToDisplay;
+                //stackedColumn.MappingName = "GridTitleToDisplay";
+                //stackedColumn.ChildColumns = "ForwardBackwardButtons";
+                //stackedHeaderRow.StackedColumns.Add(stackedColumn);
+
+                //TagsAndValuesDataGrid.StackedHeaderRows.Add(stackedHeaderRow);
             }
             else
             {

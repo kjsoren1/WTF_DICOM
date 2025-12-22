@@ -31,6 +31,7 @@ public partial class MainWindow
         viewModel.TagsAndValuesDockingManager = TagsAndValuesDockingManager;
         viewModel.SequencesDockingManager = TabbedSequencesDockingManager;
         viewModel.MainDockingManager = MainWindowContentDockingManager;
+        viewModel.ReferencedFilesDockingManager = ReferencedFilesDockingManager;
         AddRecordContextMenuToDataGrid();
         AddHeaderContextMenuToDataGrid();
 

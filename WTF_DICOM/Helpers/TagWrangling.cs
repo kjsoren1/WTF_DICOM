@@ -149,12 +149,23 @@ namespace WTF_DICOM.Helpers
                 {
                     referencedSOPInstanceUIDItems.Add(dicomItem);
                 }
-                else if (IsSequence(dicomItem.Tag))
+                else if (IsSequence(dicomTag))
                 {
-                    DicomSequence seq = dicomDataset.GetSequence(dicomTag);
-                    foreach (DicomDataset innerDataset in seq)
+                    try
                     {
-                        GetAllReferencedSOPInstanceUID(innerDataset, referencedSOPInstanceUIDItems);
+                        DicomSequence seq = dicomDataset.GetSequence(dicomTag);
+                        foreach (DicomDataset innerDataset in seq)
+                        {
+                            GetAllReferencedSOPInstanceUID(innerDataset, referencedSOPInstanceUIDItems);
+                        }
+                    }
+                    catch (FellowOakDicom.DicomDataException ex)
+                    {
+                        // {"DicomTag (0249,10e0:GEMS_RTEN_01) isn't a sequence."}
+                        string errMsg = "Tag " + dicomTag.ToString() + 
+                            " contains a ValueRepresentation indicating that it is a sequence but it is NOT a sequence. Original exception: "
+                            + ex.Message;
+                        //throw new Exception(errMsg);
                     }
                 }
             }

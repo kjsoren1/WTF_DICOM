@@ -103,6 +103,28 @@
       </ContentControl>
 
       <!-- TABBED DISPLAY -->
+
+      <!-- Referenced Files Information -->
+      <ContentControl
+        x:Name="ReferencedFilesContentControl"
+        Padding="0,0,10,0"
+        syncfusion:DockingManager.DesiredHeightInFloatingMode="200"
+        syncfusion:DockingManager.DesiredWidthInDockedMode="390"
+        syncfusion:DockingManager.DesiredWidthInFloatingMode="150"
+        syncfusion:DockingManager.Header="Referenced Files"
+        syncfusion:DockingManager.SideInDockedMode="Tabbed"
+        syncfusion:DockingManager.State="Document"
+        syncfusion:DocumentContainer.MDIBounds="2,2,390,300"
+        BorderThickness="2">
+
+        <!-- Docking Manager for TagsAndValues windows -->
+        <syncfusion:DockingManager
+          x:Name="ReferencedFilesDockingManager"
+          DockFill="True">
+        </syncfusion:DockingManager>
+      </ContentControl>
+
+      <!-- Sequences -->
       <ContentControl
         x:Name="TabbedSequencesContentControl"
         Padding="0,0,10,0"
@@ -116,14 +138,13 @@
         BorderThickness="2">
 
         <!-- Docking Manager for TagsAndValues windows -->
-        <syncfusion:DockingManager
+          <syncfusion:DockingManager
           x:Name="TabbedSequencesDockingManager"
           DockFill="True">
-        </syncfusion:DockingManager>
+          </syncfusion:DockingManager>
+        </ContentControl>
 
-      </ContentControl>
-
-      <!-- RHS DISPLAY -->
+      <!-- File Specific Information -->
       <ContentControl
         x:Name="TagsAndValuesContentControl"
         Padding="0,0,10,0"
@@ -141,7 +162,6 @@
           x:Name="TagsAndValuesDockingManager"
           DockFill="True">
         </syncfusion:DockingManager>
-
       </ContentControl>
 
     </syncfusion:DockingManager>
@@ -151,7 +171,7 @@
   
   <Window.Resources>
     <Style x:Key="forwardBackwardButtonsStackedHeaderCell"  TargetType="syncfusion:GridStackedHeaderCellControl">
-      <Setter Property="FontSize" Value="16"/>
+      <Setter Property="FontSize" Value="14"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="BorderBrush" Value="CornflowerBlue"/>
       <Setter Property="Template">
@@ -166,7 +186,8 @@
               <syncfusion:ButtonAdv Command="{Binding Plus1Command}" Label="" SmallIcon="/Resources/Increment.png" Margin="1,2,1,2" Padding="1,3,1,3"/>
               <syncfusion:ButtonAdv Command="{Binding Plus5Command}" Label="" SmallIcon="/Resources/FFwd.png" Margin="1,2,1,2" Padding="1,3,1,3"/>
               <syncfusion:ButtonAdv Command="{Binding LastCommand}" Label="" SmallIcon="/Resources/Last.png" Margin="1,2,1,2" Padding="1,3,1,3"/>
-
+              <TextBlock Text="{Binding DicomFileName}" VerticalAlignment="Center" Margin="10,0,4,0" TextWrapping="WrapWithOverflow">
+              </TextBlock>
               <StackPanel.Style>
                 <Style TargetType="{x:Type StackPanel}">
                   <Setter Property="Visibility" Value="Visible"/>

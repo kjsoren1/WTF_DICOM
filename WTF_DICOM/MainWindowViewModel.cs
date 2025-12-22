@@ -74,6 +74,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     public DockingManager? TagsAndValuesDockingManager { get; set; }
     public DockingManager? SequencesDockingManager { get; set; }
     public DockingManager? MainDockingManager { get; set; }
+    public DockingManager? ReferencedFilesDockingManager { get; set; }
 
     public MainWindowViewModel()
     {
@@ -320,9 +321,11 @@ public partial class MainWindowViewModel : ObservableRecipient
 
                 ReferencedSOPInstanceUIDViewModel referencedSOPInstanceUIDViewModel =
                     new ReferencedSOPInstanceUIDViewModel(referencedFiles, dfc.DicomFileName);
-                ReferencedSOPInstanceUIDsWindow window =
-                    new ReferencedSOPInstanceUIDsWindow(referencedSOPInstanceUIDViewModel);
-                window.Show();
+                ReferencedFilesContentControl referencedFilesCC = new ReferencedFilesContentControl(referencedSOPInstanceUIDViewModel);
+                DockingManager.SetHeader(referencedFilesCC, dfc.Modality);
+
+                ReferencedFilesDockingManager.Children.Add(referencedFilesCC);
+                MainDockingManager.ActivateWindow("ReferencedFilesContentControl");
             }
         }
     }
@@ -367,7 +370,7 @@ public partial class MainWindowViewModel : ObservableRecipient
 
         if (DicomFiles.Count > 0 && MyDataGrid != null)
         {
-            //MyDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
+            //ReferencedFilesDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
             MyDataGrid.GridColumnSizer.Refresh();
         }
     }
@@ -490,7 +493,7 @@ public partial class MainWindowViewModel : ObservableRecipient
         //        //cbBinding.Mode = BindingMode.TwoWay;
         //        //cbBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
         //        //column.DisplayBinding = cbBinding;
-        //        MyDataGrid.Columns.Add(column);
+        //        ReferencedFilesDataGrid.Columns.Add(column);
         //        DynamicColumns.Add(headerString, column);
         //        ++idx;
         //    }
@@ -503,7 +506,7 @@ public partial class MainWindowViewModel : ObservableRecipient
         //            DisplayBinding = new Binding($"ItemsToDisplay[1].Count")
         //        };
 
-        //        MyDataGrid.Columns.Add(column);
+        //        ReferencedFilesDataGrid.Columns.Add(column);
         //        DynamicColumns.Add(headerString, column);
         //        ++idx;
         //    }

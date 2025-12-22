@@ -27,6 +27,10 @@ public class GridStackedHeaderCellRendererExt : GridStackedHeaderCellRenderer
             var style = App.Current.MainWindow.Resources["forwardBackwardButtonsStackedHeaderCell"] as Style;
             uiElement.Style = style;
         }
+        else
+        {
+            var dc = uiElement.DataContext;
+        }
         base.OnInitializeEditElement(dataColumn, uiElement, dataContext);
     }
 }
