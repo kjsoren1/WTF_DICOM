@@ -273,7 +273,7 @@ namespace WTF_DICOM
             LastSelectedCellColumnIndex = columnIndex;
         }
 
-        public void CreateSfDataGrid()
+        private void CreateSfDataGrid()
         {
             TagsAndValuesDataGrid = new SfDataGrid();
             TagsAndValuesDataGrid.SelectionUnit = GridSelectionUnit.Cell;

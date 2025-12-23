@@ -34,34 +34,6 @@ namespace WTF_DICOM.Models
         [NotifyPropertyChangedRecipients]
         private string? _SeriesInstanceUID = "seriesUIDToBe";
 
-        //public int NumberRelatedFiles
-        //{
-        //    get
-        //    {
-        //        return RelatedDicomFiles.Count + 1;
-        //    }
-        //}
-
-        ////[ObservableProperty]
-        ////[NotifyPropertyChangedRecipients]
-        //private bool _selected = false;
-        //public bool Selected
-        //{
-        //    get { return _selected; }
-        //    set
-        //    {
-        //        if (_selected != value)
-        //        {
-        //            _selected = value;
-        //            OnPropertyChanged(nameof(Selected));
-        //            if (ItemsToDisplay.Count > 0)
-        //                ItemsToDisplay[0].IsSelected = value;
-        //        }
-        //    }
-        //}
-
-
-        // REARCHITECT so this this is a WTFDicomDataset instead..................................
         public WTFDicomDataset? MyDicomDataset { get; private set; }
 
         public ObservableCollection<WTFDicomItem> ItemsToDisplay { get; } = new();

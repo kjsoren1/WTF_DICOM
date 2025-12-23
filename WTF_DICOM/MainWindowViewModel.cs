@@ -192,13 +192,6 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     public void ShowAllTags(DicomFileCommon dicomFileCommon)
     {
-        //// make a pop-up window and bind to dfc.TagsAndValuesList
-        //dfc.ReadAllTags();
-        //TagsAndValuesViewModel tagsAndValuesViewModel = new TagsAndValuesViewModel(this, dfc);
-
-        //TagsAndValuesWindow tagsAndValuesWindow = new TagsAndValuesWindow(tagsAndValuesViewModel);
-        //tagsAndValuesWindow.Show();
-
         if (TagsAndValuesDockingManager == null) return;
         // make a pop-up window and bind to dfc.TagsAndValuesList
         try
@@ -415,20 +408,12 @@ public partial class MainWindowViewModel : ObservableRecipient
             return;
         }
         DicomFileCommon? existingFile = null;
-
         existingFile = FindSeriesWSameModalityInList(fileToAdd);
 
-        //if (existingFile != null)
-        //{
-        //    existingFile.RelatedDicomFiles.Add(fileToAdd);
-        //}
-        //else
-        {
-            fileToAdd.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
-            fileToAdd.TagColumnsToDisplay = TagColumnsToDisplay;
-            if (refreshDisplay) fileToAdd.SetItemsToDisplay();
-            DicomFiles.Add(fileToAdd);
-        }
+        fileToAdd.NonTagColumnsToDisplay = NonTagColumnsToDisplay;
+        fileToAdd.TagColumnsToDisplay = TagColumnsToDisplay;
+        if (refreshDisplay) fileToAdd.SetItemsToDisplay();
+        DicomFiles.Add(fileToAdd);
 
         //FilterByModality("RTPLAN");
     }
@@ -438,6 +423,7 @@ public partial class MainWindowViewModel : ObservableRecipient
         MyDataGrid = dataGrid;
         MyDataGrid.Columns.Clear();
         MyDataGrid.SelectionUnit=GridSelectionUnit.Row;
+        MyDataGrid.SelectionMode = Syncfusion.UI.Xaml.Grid.GridSelectionMode.Extended;
         MyDataGrid.GridColumnSizer.AutoFitMode = AutoFitMode.SmartFit;
         foreach (var dcmFile in DicomFiles)
         {
@@ -478,40 +464,6 @@ public partial class MainWindowViewModel : ObservableRecipient
         DynamicColumns.Clear();
 
         int idx = 0;
-        //foreach (var item in NonTagColumnsToDisplay)
-        //{
-        //    if (item == NonTagColumnTypes.SELECT)
-        //    {
-        //        string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.SELECT, "Select");
-        //        var column = new Syncfusion.UI.Xaml.Grid.GridCheckBoxColumn() {
-        //            HeaderText = headerString,
-        //            MappingName="Selected",
-        //            IsReadOnly = false
-        //        };
-               
-        //        //Binding cbBinding = new Binding($"Selected");
-        //        //cbBinding.Mode = BindingMode.TwoWay;
-        //        //cbBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-        //        //column.DisplayBinding = cbBinding;
-        //        ReferencedFilesDataGrid.Columns.Add(column);
-        //        DynamicColumns.Add(headerString, column);
-        //        ++idx;
-        //    }
-
-        //    if (item == NonTagColumnTypes.COUNT)
-        //    {
-        //        string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.COUNT, "Count");
-        //        var column = new Syncfusion.UI.Xaml.Grid.GridTextColumn() {
-        //            HeaderText = headerString,
-        //            DisplayBinding = new Binding($"ItemsToDisplay[1].Count")
-        //        };
-
-        //        ReferencedFilesDataGrid.Columns.Add(column);
-        //        DynamicColumns.Add(headerString, column);
-        //        ++idx;
-        //    }
-        //}
-
         string headerString = NonTagColumnTypeDictionary.GetValueOrDefault(NonTagColumnTypes.SELECT, "Select");
         var selectColumn = new Syncfusion.UI.Xaml.Grid.GridCheckBoxSelectorColumn()
         {
@@ -521,7 +473,6 @@ public partial class MainWindowViewModel : ObservableRecipient
         MyDataGrid.Columns.Add(selectColumn);
         DynamicColumns.Add(headerString, selectColumn);
         ++idx;
-
 
         foreach (var colTag in TagColumnsToDisplay)
         {
